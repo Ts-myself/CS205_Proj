@@ -1,10 +1,13 @@
-#ifndef PLAYER_HPP
-#define PLAYER_HPP
+#pragma once
+#include "unit.hpp"
 
-class Player
+#include <string>
+
+class Player : public Unit
 {
 public:
     Player();
-};
+    Player(int x, int y, std::string img_path);
 
-#endif // PLAYER_HPP
+    void move(int dx, int dy);
+};
