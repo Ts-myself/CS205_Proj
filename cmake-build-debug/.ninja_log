@@ -1,0 +1,6 @@
+# ninja log v5
+51	597	7269474102968406	CMakeFiles/CS205_Proj.dir/src/player.cpp.obj	fdfd4e3847c7c073
+82	619	7269474103188423	CMakeFiles/CS205_Proj.dir/src/unit.cpp.obj	c9c81162a6a95748
+66	865	7269474105615724	CMakeFiles/CS205_Proj.dir/src/map.cpp.obj	4f7dc373dd63d989
+19	884	7269474105852082	CMakeFiles/CS205_Proj.dir/main.cpp.obj	c89ede58a86ecdce
+35	894	7269474105916993	CMakeFiles/CS205_Proj.dir/src/level.cpp.obj	d98580b27b8496f7

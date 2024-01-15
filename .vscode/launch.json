@@ -1,0 +1,95 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(gdb) Attach",
+            "type": "cppdbg",
+            "request": "attach",
+            "program": "enter program name, for example ${workspaceFolder}/a.exe",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/path/to/gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "visualizerFile": "c:\\Users\\33543\\AppData\\Roaming\\Code\\User\\workspaceStorage\\8b0529d3f8c854206a4e82fc6f9d3f5a\\tonka3000.qtvsctools\\qt.natvis.xml"
+        },
+        {
+            "name": "(Windows) Launch",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/${workspaceFolderBasename}.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "visualizerFile": "c:\\Users\\33543\\AppData\\Roaming\\Code\\User\\workspaceStorage\\8b0529d3f8c854206a4e82fc6f9d3f5a\\tonka3000.qtvsctools\\qt.natvis.xml"
+        },
+        {
+            "name": "(Windows) Launch with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/${workspaceFolderBasename}.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:/MinGW/bin/gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "visualizerFile": "c:\\Users\\33543\\AppData\\Roaming\\Code\\User\\workspaceStorage\\8b0529d3f8c854206a4e82fc6f9d3f5a\\tonka3000.qtvsctools\\qt.natvis.xml"
+        },
+        {
+            "name": "(Windows) Attach",
+            "type": "cppvsdbg",
+            "request": "attach",
+            "program": "${workspaceFolder}/build/${workspaceFolderBasename}.exe",
+            "processId": "${command:pickProcess}",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "visualizerFile": "c:\\Users\\33543\\AppData\\Roaming\\Code\\User\\workspaceStorage\\8b0529d3f8c854206a4e82fc6f9d3f5a\\tonka3000.qtvsctools\\qt.natvis.xml"
+        },
+        {
+            "name": "(Windows) Attach with GDB",
+            "type": "cppdbg",
+            "request": "attach",
+            "program": "${workspaceFolder}/build/${workspaceFolderBasename}.exe",
+            "processId": "${command:pickProcess}",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:/MinGW/bin/gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "visualizerFile": "c:\\Users\\33543\\AppData\\Roaming\\Code\\User\\workspaceStorage\\8b0529d3f8c854206a4e82fc6f9d3f5a\\tonka3000.qtvsctools\\qt.natvis.xml"
+        }
+    ]
+}
