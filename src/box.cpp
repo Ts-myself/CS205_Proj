@@ -7,7 +7,7 @@ Box::Box() : Unit(0, 0, 5, " ") {};
 Box::Box(int x, int y, std::string img_path) : Unit(x, y, 1, img_path) {};
 
 Box::Box(const Box &other) : Unit(other.x, other.y, other.type, other.img_path) {
-    internal_level = other.internal_level;
+    internal_map = other.internal_map;
     upper_box = std::make_unique<Box>(*other.upper_box);
 }
 
@@ -16,7 +16,7 @@ Box &Box::operator=(const Box &other) {
     y = other.y;
     type = other.type;
     img_path = other.img_path;
-    internal_level = other.internal_level;
+    internal_map = other.internal_map;
     upper_box = std::make_unique<Box>(*other.upper_box);
     return *this;
 }

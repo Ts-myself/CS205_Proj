@@ -3,7 +3,6 @@
 #include <string>
 #include <memory>
 
-#include "level.hpp"
 #include "unit.hpp"
 #include "map.hpp"
 
@@ -20,7 +19,7 @@ public:
     Box &operator=(const Box &other);
 
 
-    Level internal_level;
+    Map internal_map;
     std::unique_ptr<Box> upper_box = nullptr;
     std::unique_ptr<Box> father_box = nullptr;
 };
