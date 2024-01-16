@@ -128,23 +128,193 @@ void Level::print_level_CIL() {
         }
     }
 }
-
-bool Level::player_movable(size_t player_index, int dx, int dy) {
-    if (map.map_units[players[player_index].y + dy][players[player_index].x + dx].type == 2) {
-        return false;
+// 0: not movable, 1: movable, 2: movable and push box,
+// 3 : out of internal level, 4+: enter internal level,value - 4 is which box is be entered
+int Level::player_movable(size_t player_index, int dx, int dy) {
+    int next_x = players[player_index].x + dx;
+    int next_y = players[player_index].y + dy;
+    //out of map in box
+    if (next_x < 1 || next_x > map.width || next_y < 1 || next_y > map.height){
+        return 3;
     }
-    for (const auto &box: boxes) {
-        if (box.x == players[player_index].x + dx && box.y == players[player_index].y + dy) {
-            if (map.map_units[box.y + dy][box.x + dx].type == 2) {
-                return false;
+    int next_type = map.map_units[next_y][next_x].type;
+    if (next_type == 0 || next_type == 2) {
+        return 0;
+    }
+    if (next_type == 6 || next_type == 5) {
+        return 1;
+    }
+    if (next_type == 1){
+        int num_box = 0;
+        while (map.map_units[next_y][next_x].type == 1) {
+            next_x += dx;
+            next_y += dy;
+            num_box++;
+            if (next_x < 1 || next_x > map.width || next_y < 1 || next_y > map.height) {
+                break;
             }
-            // todo: fix by moving multiple boxes
-            for (const auto &box2: boxes) {
-                if (box2.x == box.x + dx && box2.y == box.y + dy) {
-                    return false;
+        }
+        //out of map in box
+        if (next_x < 1 || next_x > map.width || next_y < 1 || next_y > map.height){
+            return 3;
+        }
+        int temp_map_type = map.map_units[next_y + dy][next_x + dx].type;
+        //move multiple boxes
+        if (temp_map_type == 6) {
+            return 2;
+        }
+        if (temp_map_type == 0 || temp_map_type == 2) {
+            int temp_x = next_x - dx;
+            int temp_y = next_y - dy;
+            for (int i = num_box; i > 0; i--) {
+                Box *temp_box = get_box(next_x, next_y);
+                if (temp_box == nullptr) {
+                    return 0;
+                }
+                if (!temp_box->is_has_internal_level) {
+                    temp_x -= dx;
+                    temp_y -= dy;
+                    next_x -= dx;
+                    next_y -= dy;
+                    continue;
+                }
+                if (!is_can_enter(dx, dy, temp_box->enter_direction)) {
+                    temp_x -= dx;
+                    temp_y -= dy;
+                    next_x -= dx;
+                    next_y -= dy;
+                    continue;
+                }
+                return 4 + i;
+            }
+            return 0;
+        }
+    }
+    return 0;
+
+}
+
+void Level::player_move(size_t player_index, int dx, int dy,int player_movable) {
+    if (player_movable == 0) {
+        return;
+    }
+    if (player_movable == 1) {
+        players[player_index].move(dx, dy);
+        return;
+    }
+    if (player_movable == 2) {
+        int next_x = players[player_index].x + dx;
+        int next_y = players[player_index].y + dy;
+        int num_box = 0;
+        while (map.map_units[next_y][next_x].type == 1) {
+            next_x += dx;
+            next_y += dy;
+            num_box++;
+            if (next_x < 1 || next_x > map.width || next_y < 1 || next_y > map.height) {
+                break;
+            }
+        }
+        for (int i = num_box; i > 0 ; i--) {
+            Box *temp_box = get_box(next_x, next_y);
+            temp_box->move(dx, dy);
+            next_x -= dx;
+            next_y -= dy;
+        }
+        players[player_index].move(dx, dy);
+        return;
+    }
+    if (player_movable == 3) {
+        int next_x = players[player_index].x;
+        int next_y = players[player_index].y;
+        int num_box = 0;
+        if (next_x >= 1 && next_x <= map.width && next_y >= 1 && next_y <= map.height) {
+            while (map.map_units[next_y + dy][next_x + dx].type == 1) {
+                next_x += dx;
+                next_y += dy;
+                num_box++;
+                if (next_x < 1 || next_x > map.width || next_y < 1 || next_y > map.height) {
+                    break;
                 }
             }
         }
+        if (num_box == 0) {
+            Player *temp_player = &players[player_index];
+            players.erase(players.begin() + player_index);
+            father_box->father_level.players.push_back(*temp_player);
+            temp_player->x = father_box->x + dx;
+            temp_player->y = father_box->y + dy;
+            return;
+        }
+        return;
     }
-    return true;
+    if (player_movable > 3){
+        int next_x = players[player_index].x;
+        int next_y = players[player_index].y;
+        int num_box = player_movable - 4;
+        for (int i = 0; i < num_box-1; ++i) {
+            next_x += dx;
+            next_y += dy;
+        }
+
+    }
+}
+
+void Level::rew_state_Box() {
+    for (auto &box: boxes) {
+        if (map.map_units[box.y][box.x].type == 4) {
+            box.state = 1;
+        } else {
+            box.state = 0;
+        }
+    }
+}
+void Level::rew_state_Player() {
+    for (auto &player: players) {
+        if (player.state >= 2) {
+            continue;
+        }
+        if (map.map_units[player.y][player.x].type == 3) {
+            player.state = 1;
+        } else {
+            player.state = 0;
+        }
+    }
+}
+void Level::rew_state_All() {
+    rew_state_Box();
+    rew_state_Player();
+}
+
+Box *Level::get_box(int x, int y) {
+    for (auto &box: boxes) {
+        if (box.x == x && box.y == y) {
+            return &box;
+        }
+    }
+    return nullptr;
+}
+bool Level::is_can_enter(int dx, int dy, int direction) {
+    switch (direction) {
+        case 1:
+            if (dy==-1&&dx==0){
+                return true;
+            }
+            break;
+        case 2:
+            if (dy==1&&dx==0){
+                return true;
+            }
+            break;
+        case 3:
+            if (dy==0&&dx==-1){
+                return true;
+            }
+            break;
+        case 4:
+            if (dy==0&&dx==1){
+                return true;
+            }
+            break;
+        default:return false;
+    }
 }

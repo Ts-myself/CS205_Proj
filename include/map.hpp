@@ -1,7 +1,7 @@
 #pragma once
 
 #include "unit.hpp"
-
+#include <vector>
 #include <string>
 
 static constexpr int MAP_WIDTH = 31;

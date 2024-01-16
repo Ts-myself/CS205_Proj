@@ -32,9 +32,21 @@ int main() {
 
     std::vector<Player> default_players{Player(2, 2, " ")};
     std::vector<Box> default_boxes;
-//    default_boxes.push_back(Box(3, 2, " "));
-//    default_boxes.push_back(Box(6, 2, " "));
-
+    default_boxes.push_back(Box(3, 2, " "));
+    default_boxes.push_back(Box(6, 2, " "));
+    std::string test_internalBox_map_str = "########\n"
+                                           "#------#\n"
+                                           "##-----#\n"
+                                           "#-------\n"
+                                           "##--#--#\n"
+                                           "#------#\n"
+                                           "#----###\n"
+                                           "########\n";
+    Map test_internalBox_map(8, 8);
+    test_internalBox_map.draw_map(test_internalBox_map_str);
+    default_boxes[0].internal_level.map = test_internalBox_map;
+    default_boxes[0].is_has_internal_level = true;
+    default_boxes[0].enter_direction = 4;
     std::cout
             << "Enter 'q' to quit, 'r' to restart, 'w' to move up, 'a' to move left, 's' to move down, 'd' to move right."
             << std::endl;
