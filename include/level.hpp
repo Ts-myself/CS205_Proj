@@ -28,6 +28,6 @@ public:
 
     Box *get_box(int x, int y);
     bool is_can_enter(int dx, int dy, int direction);
-
-    Box *father_box = nullptr;
+    //level in this box
+    std::unique_ptr<Box> father_box = nullptr;
 };

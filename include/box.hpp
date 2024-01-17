@@ -5,7 +5,8 @@
 
 #include "unit.hpp"
 #include "map.hpp"
-#include "level.hpp"
+
+class Level;
 
 class Box : public Unit {
 public:
@@ -21,12 +22,13 @@ public:
 
     Box &operator=(const Box &other);
 
-
-    Level internal_level;
+    //box has this level
+    Level *internal_level = nullptr;
     bool is_has_internal_level = false;
     int enter_direction = 0; // 1: up, 2: down, 3: left, 4: right
-
+    //box in this level
     Level *father_level = nullptr;
+
     std::unique_ptr<Box> upper_box = nullptr;
     std::unique_ptr<Box> father_box = nullptr;
 };

@@ -44,7 +44,7 @@ int main() {
                                            "########\n";
     Map test_internalBox_map(8, 8);
     test_internalBox_map.draw_map(test_internalBox_map_str);
-    default_boxes[0].internal_level.map = test_internalBox_map;
+    default_boxes[0].internal_level->map = test_internalBox_map;
     default_boxes[0].is_has_internal_level = true;
     default_boxes[0].enter_direction = 4;
     std::cout
@@ -72,24 +72,20 @@ bool operation_player_move(Level &level1) {
         return true;
     }
     if (operator_input == 'w') {
-        if (!level1.player_movable(0, 0, -1))
-            return true;
-        level1.players[0].move(0, -1);
+        int movable = level1.player_movable(0, 0, -1);
+        level1.player_move(0, 0, -1, movable);
     }
     if (operator_input == 'a') {
-        if (!level1.player_movable(0, -1, 0))
-            return true;
-        level1.players[0].move(-1, 0);
+        int movable = level1.player_movable(0, -1, 0);
+        level1.player_move(0, -1, 0, movable);
     }
     if (operator_input == 's') {
-        if (!level1.player_movable(0, 0, 1))
-            return true;
-        level1.players[0].move(0, 1);
+        int movable = level1.player_movable(0, 0, 1);
+        level1.player_move(0, 0, 1, movable);
     }
     if (operator_input == 'd') {
-        if (!level1.player_movable(0, 1, 0))
-            return true;
-        level1.players[0].move(1, 0);
+        int movable = level1.player_movable(0, 1, 0);
+        level1.player_move(0, 1, 0, movable);
     }
     std::cout << "player position: " << level1.players[0].x << "," << level1.players[0].y << std::endl;
 

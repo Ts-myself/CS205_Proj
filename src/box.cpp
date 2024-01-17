@@ -34,4 +34,5 @@ Box &Box::operator=(const Box &other) {
 void Box::move(int dx, int dy) {
     x += dx;
     y += dy;
+
 }

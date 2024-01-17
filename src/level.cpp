@@ -145,12 +145,12 @@ int Level::player_movable(size_t player_index, int dx, int dy) {
         return 1;
     }
     if (next_type == 1){
-        int num_box = 0;
+        int num_box = 1;
         while (map.map_units[next_y][next_x].type == 1) {
             next_x += dx;
             next_y += dy;
             num_box++;
-            if (next_x < 1 || next_x > map.width || next_y < 1 || next_y > map.height) {
+            if (next_x < 1 || next_x > map.width || next_y < 1) {
                 break;
             }
         }
@@ -158,12 +158,14 @@ int Level::player_movable(size_t player_index, int dx, int dy) {
         if (next_x < 1 || next_x > map.width || next_y < 1 || next_y > map.height){
             return 3;
         }
-        int temp_map_type = map.map_units[next_y + dy][next_x + dx].type;
+        int temp_map_type = map.map_units[next_y][next_x].type;
         //move multiple boxes
         if (temp_map_type == 6) {
             return 2;
         }
         if (temp_map_type == 0 || temp_map_type == 2) {
+            next_x -= dx;
+            next_y -= dy;
             int temp_x = next_x - dx;
             int temp_y = next_y - dy;
             for (int i = num_box; i > 0; i--) {
@@ -196,67 +198,64 @@ int Level::player_movable(size_t player_index, int dx, int dy) {
 
 void Level::player_move(size_t player_index, int dx, int dy,int player_movable) {
     if (player_movable == 0) {
+        std::cout << "player can't move" << std::endl;
         return;
     }
     if (player_movable == 1) {
         players[player_index].move(dx, dy);
         return;
     }
-    if (player_movable == 2) {
+    if(player_movable == 2){
         int next_x = players[player_index].x + dx;
         int next_y = players[player_index].y + dy;
-        int num_box = 0;
+        players[player_index].move(dx, dy);
         while (map.map_units[next_y][next_x].type == 1) {
+            Box *temp_box = get_box(next_x, next_y);
+            if (temp_box == nullptr) {
+                return;
+            }
+            temp_box->move(dx, dy);
             next_x += dx;
             next_y += dy;
-            num_box++;
-            if (next_x < 1 || next_x > map.width || next_y < 1 || next_y > map.height) {
-                break;
-            }
         }
-        for (int i = num_box; i > 0 ; i--) {
-            Box *temp_box = get_box(next_x, next_y);
-            temp_box->move(dx, dy);
-            next_x -= dx;
-            next_y -= dy;
-        }
-        players[player_index].move(dx, dy);
         return;
     }
-    if (player_movable == 3) {
-        int next_x = players[player_index].x;
-        int next_y = players[player_index].y;
-        int num_box = 0;
-        if (next_x >= 1 && next_x <= map.width && next_y >= 1 && next_y <= map.height) {
-            while (map.map_units[next_y + dy][next_x + dx].type == 1) {
-                next_x += dx;
-                next_y += dy;
-                num_box++;
-                if (next_x < 1 || next_x > map.width || next_y < 1 || next_y > map.height) {
-                    break;
-                }
-            }
-        }
-        if (num_box == 0) {
-            Player *temp_player = &players[player_index];
+    if (player_movable == 3){
+        int next_x = players[player_index].x + dx;
+        int next_y = players[player_index].y + dy;
+        if (next_x < 1 || next_x > map.width || next_y < 1 || next_y > map.height){
+            Player temp_player = players[player_index];
+            father_box->father_level->players.push_back(temp_player);
             players.erase(players.begin() + player_index);
-            father_box->father_level.players.push_back(*temp_player);
-            temp_player->x = father_box->x + dx;
-            temp_player->y = father_box->y + dy;
+            temp_player.x = father_box->x+dx;
+            temp_player.y = father_box->y+dy;
+            temp_player.father_level = father_box->father_level;
             return;
         }
-        return;
-    }
-    if (player_movable > 3){
-        int next_x = players[player_index].x;
-        int next_y = players[player_index].y;
-        int num_box = player_movable - 4;
-        for (int i = 0; i < num_box-1; ++i) {
+        while (map.map_units[next_y][next_x].type == 1) {
+            Box *temp_box_1 = get_box(next_x, next_y);
+            if (temp_box_1 == nullptr) {
+                return;
+            }
+            temp_box_1->move(dx, dy);
             next_x += dx;
             next_y += dy;
+            if (next_x < 1 || next_x > map.width || next_y < 1 || next_y > map.height){
+                Box *temp_box = get_box(next_x-dx, next_y-dy);
+                if (temp_box == nullptr) {
+                    return;
+                }
+                boxes.erase(boxes.begin() + (temp_box - &boxes[0]));
+                father_box->father_level->boxes.push_back(*temp_box);
+                temp_box->x = father_box->x+dx;
+                temp_box->y = father_box->y+dy;
+                temp_box->father_level = father_box->father_level;
+            }
         }
+        players[player_index].move(dx, dy);
 
     }
+    //todo:enter internal level ,value - 4 is which box is be entered,design the change of player and box
 }
 
 void Level::rew_state_Box() {
