@@ -31,6 +31,7 @@ void Level::print_level_CIL() {
                 level_print_row[player.x - 1] = symbol[0];
             }
         }
+        int a;
         for (const auto &box: boxes) {
             if (box.y != i) {
                 continue;
