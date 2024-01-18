@@ -15,6 +15,8 @@ public:
 
     void print_level_CIL();
 
+    bool is_box(int x, int y, std::vector<Box> &boxes);
+
     int player_movable(size_t player_index, int dx, int dy);
     void player_move(size_t player_index, int dx, int dy,int player_movable);
 

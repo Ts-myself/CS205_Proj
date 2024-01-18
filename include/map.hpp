@@ -4,8 +4,8 @@
 #include <vector>
 #include <string>
 
-static constexpr int MAP_WIDTH = 31;
-static constexpr int MAP_HEIGHT = 31;
+static constexpr int MAP_WIDTH = 16;
+static constexpr int MAP_HEIGHT = 16;
 
 class Map {
 public:

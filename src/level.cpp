@@ -1,6 +1,7 @@
 #include "../include/level.hpp"
 
 #include <iostream>
+#include <string>
 
 Level::Level() {};
 
@@ -139,6 +140,9 @@ int Level::player_movable(size_t player_index, int dx, int dy) {
         return 3;
     }
     int next_type = map.map_units[next_y][next_x].type;
+    if (is_box(next_x,next_y,boxes)){
+        next_type = 1;
+    }
     if (next_type == 0 || next_type == 2) {
         return 0;
     }
@@ -146,8 +150,8 @@ int Level::player_movable(size_t player_index, int dx, int dy) {
         return 1;
     }
     if (next_type == 1){
-        int num_box = 1;
-        while (map.map_units[next_y][next_x].type == 1) {
+        int num_box = 0;
+        while (is_box(next_x,next_y,boxes)) {
             next_x += dx;
             next_y += dy;
             num_box++;
@@ -161,7 +165,7 @@ int Level::player_movable(size_t player_index, int dx, int dy) {
         }
         int temp_map_type = map.map_units[next_y][next_x].type;
         //move multiple boxes
-        if (temp_map_type == 6) {
+        if (temp_map_type == 6||temp_map_type == 5) {
             return 2;
         }
         if (temp_map_type == 0 || temp_map_type == 2) {
@@ -206,39 +210,44 @@ void Level::player_move(size_t player_index, int dx, int dy,int player_movable) 
         players[player_index].move(dx, dy);
         return;
     }
-    if(player_movable == 2){
+    if (player_movable == 2) {
         int next_x = players[player_index].x + dx;
         int next_y = players[player_index].y + dy;
         players[player_index].move(dx, dy);
-        while (map.map_units[next_y][next_x].type == 1) {
+        std::vector<Box*> temp_boxes;
+        while (is_box(next_x,next_y, boxes)) {
             Box *temp_box = get_box(next_x, next_y);
             if (temp_box == nullptr) {
                 return;
             }
-            temp_box->move(dx, dy);
+            temp_boxes.push_back(temp_box);
             next_x += dx;
             next_y += dy;
         }
+        for (auto temp_box : temp_boxes) {
+            temp_box->move(dx, dy);
+        }
         return;
     }
-    if (player_movable == 3){
+    if (player_movable == 3) {
         int next_x = players[player_index].x + dx;
         int next_y = players[player_index].y + dy;
         if (next_x < 1 || next_x > map.width || next_y < 1 || next_y > map.height){
-            Player temp_player = players[player_index];
-            father_box->father_level->players.push_back(temp_player);
-            players.erase(players.begin() + player_index);
-            temp_player.x = father_box->x+dx;
-            temp_player.y = father_box->y+dy;
-            temp_player.father_level = father_box->father_level;
+            Player* temp_player = &players[player_index];
+            players.erase(players.begin() + 0);
+            temp_player->x = father_box->x+dx;
+            temp_player->y = father_box->y+dy;
+            father_box->father_level->players.push_back(*temp_player);
             return;
         }
-        while (map.map_units[next_y][next_x].type == 1) {
+        players[player_index].move(dx, dy);
+        std::vector<Box*> temp_boxes;
+        while (is_box(next_x,next_y,boxes)) {
             Box *temp_box_1 = get_box(next_x, next_y);
             if (temp_box_1 == nullptr) {
                 return;
             }
-            temp_box_1->move(dx, dy);
+            temp_boxes.push_back(temp_box_1);
             next_x += dx;
             next_y += dy;
             if (next_x < 1 || next_x > map.width || next_y < 1 || next_y > map.height){
@@ -247,16 +256,63 @@ void Level::player_move(size_t player_index, int dx, int dy,int player_movable) 
                     return;
                 }
                 boxes.erase(boxes.begin() + (temp_box - &boxes[0]));
-                father_box->father_level->boxes.push_back(*temp_box);
+                father_box->inter_level->boxes.push_back(*temp_box);
                 temp_box->x = father_box->x+dx;
                 temp_box->y = father_box->y+dy;
-                temp_box->father_level = father_box->father_level;
+                temp_box->father_box = father_box->father_box;
+                break;
             }
         }
-        players[player_index].move(dx, dy);
-
+        for (auto  temp_box : temp_boxes) {
+            temp_box->move(dx, dy);
+        }
     }
-    //todo:enter internal level ,value - 4 is which box is be entered,design the change of player and box
+    if (player_movable >= 4)
+    {
+        int next_x = players[player_index].x;
+        int next_y = players[player_index].y;
+        for (size_t i = 0; i < player_movable-4; i++)
+        {
+            next_x += dx;
+            next_y += dy;
+        }
+        Box *temp_box = get_box(next_x, next_y);
+        if (player_movable-4 == 1)
+        {
+            Player* temp_player = &players[player_index];
+            players.erase(players.begin() + player_index);
+            temp_player->x = temp_box->position_to_enter[0];
+            temp_player->y = temp_box->position_to_enter[1];
+            temp_box->inter_level->players.push_back(*temp_player);
+            return;
+        }
+        Box *temp_box_1 = get_box(next_x-dx, next_y-dy);
+        if (temp_box_1 == nullptr) {
+            return;
+        }
+        boxes.erase(boxes.begin() + (temp_box_1 - &boxes[0]));
+        temp_box_1->x = temp_box->position_to_enter[0];
+        temp_box_1->y = temp_box->position_to_enter[1];
+        temp_box_1->father_box = std::make_shared<Box>(*temp_box);
+        temp_box->inter_level->boxes.push_back(*temp_box_1);
+        players[player_index].move(dx, dy);
+        next_x -= 2*dx;
+        next_y -= 2*dy;
+        std::vector<Box*> temp_boxes;
+        while (is_box(next_x,next_y,boxes)) {
+            Box *temp_box_2 = get_box(next_x, next_y);
+            if (temp_box_2 == nullptr) {
+                return;
+            }
+            temp_boxes.push_back(temp_box_2);
+            next_x -= dx;
+            next_y -= dy;
+        }
+        for (auto temp_box_3 : temp_boxes) {
+            temp_box_3->move(dx, dy);
+        }
+    }
+    
 }
 
 void Level::rew_state_Box() {
@@ -296,25 +352,34 @@ Box *Level::get_box(int x, int y) {
 bool Level::is_can_enter(int dx, int dy, int direction) {
     switch (direction) {
         case 1:
-            if (dy==-1&&dx==0){
-                return true;
-            }
-            break;
-        case 2:
             if (dy==1&&dx==0){
                 return true;
-            }
+            }else return false;
+            break;
+        case 2:
+            if (dy==-1&&dx==0){
+                return true;
+            }else return false;
             break;
         case 3:
-            if (dy==0&&dx==-1){
-                return true;
-            }
-            break;
-        case 4:
             if (dy==0&&dx==1){
                 return true;
-            }
+            }else return false;
+            break;
+        case 4:
+            if (dy==0&&dx==-1){
+                return true;
+            } else return false;
             break;
         default:return false;
     }
+}
+
+bool Level::is_box(int x, int y, std::vector<Box> &boxes) {
+    for (auto &box: boxes) {
+        if (box.x == x && box.y == y) {
+            return true;
+        }
+    }
+    return false;
 }
