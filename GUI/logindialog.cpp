@@ -1,7 +1,7 @@
 #include "logindialog.h"
 #include "ui_logindialog.h"
 
-#include <iostream>
+// #include <filesystem>
 #include <fstream>
 #include <vector>
 #include <string>
@@ -20,9 +20,15 @@ LogInDialog::~LogInDialog()
 }
 
 void readUserAndPwd(std::vector<std::string> &user,std::vector<std::string> &pwd){
-    std::ifstream file("data/user_pwd.txt");
+    // std::filesystem::path path = std::filesystem::current_path();
+    // std::string path_str = path.string();
+    // std::string file_path = path_str + "\\data\\user_pwd.txt";
+    // todo: change the path (qmake will change the source)
+    std::string file_path = "D:\\Data\\university\\Study\\Sophomore_Fisrt\\C++\\Proj\\CS205_Proj\\data\\user_pwd.txt";
 
-    if (!file) {
+    std::ifstream file(file_path);
+
+    if (!file.is_open()) {
         return;
     }
 
@@ -45,9 +51,21 @@ void LogInDialog::on_loginButton_clicked()
 {
     std::vector<std::string> user;
     std::vector<std::string> password;
-    readUserAndPwd(user,password);
-    if(std::find(user.begin(),user.end(),ui->usernameEdit->text().toStdString())!=user.end() &&
-        std::find(password.begin(),password.end(),ui->passwordEdit->text().toStdString())!=password.end() )
+    readUserAndPwd(user, password);
+    std::string user_input = ui->usernameEdit->text().toStdString();
+    std::string pwd_input = ui->passwordEdit->text().toStdString();
+    int user_pos=-1, pwd_pos=-1;
+    for(int i=0;i<user.size();i++)
+        if(user[i]==user_input){
+            user_pos = i;
+            break;
+        }
+    for(int i=0;i<password.size();i++)
+        if(password[i]==pwd_input){
+            pwd_pos = i;
+            break;
+        }
+    if(user_pos != -1 && pwd_pos != -1 && user_pos == pwd_pos)
     {
         accept();
     } else {

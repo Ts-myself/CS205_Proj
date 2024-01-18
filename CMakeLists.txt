@@ -24,7 +24,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         GUI/logindialog.h GUI/logindialog.cpp GUI/logindialog.ui
-        data/user_pwd
+        data/user_pwd.txt
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET 1 APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
