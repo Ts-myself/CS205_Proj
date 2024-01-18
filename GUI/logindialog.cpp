@@ -12,6 +12,7 @@ LogInDialog::LogInDialog(QWidget *parent)
     , ui(new Ui::LogInDialog)
 {
     ui->setupUi(this);
+    ui->passwordEdit->setEchoMode(QLineEdit::EchoMode::Password);
 }
 
 LogInDialog::~LogInDialog()
@@ -25,6 +26,7 @@ void readUserAndPwd(std::vector<std::string> &user,std::vector<std::string> &pwd
     // std::string file_path = path_str + "\\data\\user_pwd.txt";
     // todo: change the path (qmake will change the source)
     std::string file_path = "D:\\Data\\university\\Study\\Sophomore_Fisrt\\C++\\Proj\\CS205_Proj\\data\\user_pwd.txt";
+    // std::string file_path = ":\\..\\data\\user_pwd.txt";
 
     std::ifstream file(file_path);
 
