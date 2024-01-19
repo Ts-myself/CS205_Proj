@@ -5,7 +5,7 @@
 
 Level::Level() {};
 
-Level::Level(int level_number, Map &map, std::vector<Player*> &players, std::vector<Box> &boxes) {
+Level::Level(int level_number, Map &map, std::vector<Player*> &players, std::vector<Box*> &boxes) {
     this->level_number = level_number;
     this->map = map;
     this->players = players;
@@ -34,13 +34,13 @@ void Level::print_level_CIL() {
         }
         int a;
         for (const auto &box: boxes) {
-            if (box.y != i) {
+            if (box->y != i) {
                 continue;
             }
-            if (map.map_units[box.x][box.y].type == 4) {
-                level_print_row[box.x - 1] = symbol[8];
+            if (map.map_units[box->x][box->y].type == 4) {
+                level_print_row[box->x - 1] = symbol[8];
             } else {
-                level_print_row[box.x - 1] = symbol[1];
+                level_print_row[box->x - 1] = symbol[1];
             }
         }
         // print the row
@@ -317,10 +317,10 @@ void Level::print_level_CIL() {
 
 void Level::rew_state_Box() {
     for (auto &box: boxes) {
-        if (map.map_units[box.y][box.x].type == 4) {
-            box.state = 1;
+        if (map.map_units[box->y][box->x].type == 4) {
+            box->state = 1;
         } else {
-            box.state = 0;
+            box->state = 0;
         }
     }
 }
@@ -343,8 +343,8 @@ void Level::rew_state_All() {
 
 Box *Level::get_box(int x, int y) {
     for (auto &box: boxes) {
-        if (box.x == x && box.y == y) {
-            return &box;
+        if (box->x == x && box->y == y) {
+            return box;
         }
     }
     return nullptr;
@@ -353,7 +353,7 @@ Box *Level::get_box(int x, int y) {
 bool Level::is_win() {
     rew_state_All();
     for (auto &box: boxes) {
-        if (box.state==0) {
+        if (box->state==0) {
             return false;
         }
     }

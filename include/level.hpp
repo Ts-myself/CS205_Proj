@@ -11,7 +11,7 @@ class Level {
 public:
     Level();
 
-    Level(int level_number, Map &map, std::vector<Player*> &players, std::vector<Box> &boxes);
+    Level(int level_number, Map &map, std::vector<Player*> &players, std::vector<Box*> &boxes);
 
     void print_level_CIL();
 
@@ -22,7 +22,7 @@ public:
     Map map;
     std::vector<Player*> players;
 
-    std::vector<Box> boxes;
+    std::vector<Box*> boxes;
     void rew_state_Box();
     void rew_state_Player();
     void rew_state_All();

@@ -32,11 +32,8 @@ int main() {
     Player player1(7, 2, " ");
     Player* player1_ptr = &player1;
     std::vector<Player*> default_players{player1_ptr};
-    std::vector<Box> default_boxes;
-    default_boxes.push_back(Box(3, 2, " "));
-    default_boxes.push_back(Box(4, 2, " "));
-    default_boxes.push_back(Box(5, 2, " "));
-    Level level1(1, default_map, default_players, default_boxes);
+    std::vector<Box*> default_boxes;
+
     std::string test_internalBox_map_str = "########\n"
                                            "#------#\n"
                                            "##-----#\n"
@@ -46,9 +43,17 @@ int main() {
                                            "#----###\n"
                                            "########\n";
     test_internalBox_map.draw_map(test_internalBox_map_str);
-    std::vector<Box> test_internalBox_boxes;
+    std::vector<Box*> test_internalBox_boxes;
     std::vector<Player*> test_internalBox_players;
     Level level2(2, test_internalBox_map, test_internalBox_players, test_internalBox_boxes);
+    int test_position_x[] = {8, 4};
+    default_boxes.push_back(new Box(3, 2, " ",4,test_position_x,true,&level2,nullptr));
+    default_boxes.push_back(new Box(4, 2, " "));
+    default_boxes.push_back(new Box(5, 2, " "));
+    Level level1(1, default_map, default_players, default_boxes);
+
+    level2.father_level = &level1;
+    level2.father_box = default_boxes[0];
     player1.in_level = &level1;
     std::cout
             << "Enter 'q' to quit, 'r' to restart, 'w' to move up, 'a' to move left, 's' to move down, 'd' to move right."
