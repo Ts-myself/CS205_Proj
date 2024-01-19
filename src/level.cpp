@@ -15,8 +15,8 @@ Level::Level(int level_number, Map &map, std::vector<Player *> &players, std::ve
 
 void Level::print_level_CIL() {
     char level_print_row[MAP_WIDTH + 1];
-    char symbol[] = {'P', 'O', '#', '@', '=', '-', ' ', 'p', 'o'};
-    // 'P'-Player, 'O'-Box, '#'-Wall, '@'-player check point, '='-box check point, ' '-empty , 'p'-Player on target, 'o'-Box on target
+    char symbol[] = {'P', 'O', '#', '=', '@', '-', ' ', 'p', 'o'};
+    // 'P'-Player, 'O'-Box, '#'-Wall, '='-player check point, '='-box check point, ' '-empty , 'p'-Player on target, 'o'-Box on target
     for (int i = 1; i <= map.height; i++) {
         // draw the map
         for (int j = 1; j <= map.width; j++) {
@@ -27,7 +27,7 @@ void Level::print_level_CIL() {
             if (player->y != i) {
                 continue;
             }
-            if (map.map_units[player->x][player->y].type == 3) {
+            if (map.map_units[player->y][player->x].type == 4) {
                 level_print_row[player->x - 1] = symbol[7];
             } else {
                 level_print_row[player->x - 1] = symbol[0];
@@ -38,7 +38,7 @@ void Level::print_level_CIL() {
             if (box->y != i) {
                 continue;
             }
-            if (map.map_units[box->x][box->y].type == 4) {
+            if (map.map_units[box->y][box->x].type == 3) {
                 level_print_row[box->x - 1] = symbol[8];
             } else {
                 level_print_row[box->x - 1] = symbol[1];
@@ -540,26 +540,42 @@ void Level::rew_state_All() {
 }
 
 Box *Level::get_box(int x, int y) {
-    for (auto &box: boxes) {
-        if (box->x == x && box->y == y) {
-            return box;
+    for (int i = boxes.size()-1; i >=0 ; --i) {
+        if (boxes[i]->x==x&&boxes[i]->y==y){
+            return boxes[i];
         }
     }
     return nullptr;
 }
 
 bool Level::is_win() {
-    rew_state_All();
-    for (auto &box: boxes) {
-        if (box->state == 0) {
-            return false;
-        }
-    }
-    for (auto &player: players) {
-        if (player->state == 0) {
-            return false;
+    for (int i = 1;i<= map.height;i++){
+        for (int j = 1;j<= map.width;j++){
+            if (map.map_units[i][j].type == 3 && !is_box(j, i)){
+                return false;
+            }
+            if (map.map_units[i][j].type == 4 && !is_player(j, i)){
+                return false;
+            }
         }
     }
     return true;
+}
+
+bool Level::is_box(int x, int y) {
+    for (auto &box: boxes) {
+        if (box->x == x && box->y == y) {
+            return true;
+        }
+    }
+    return false;
+}
+bool Level::is_player(int x, int y) {
+    for (auto &player: players) {
+        if (player->x == x && player->y == y) {
+            return true;
+        }
+    }
+    return false;
 }
 

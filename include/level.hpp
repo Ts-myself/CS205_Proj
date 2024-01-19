@@ -36,6 +36,8 @@ public:
     bool is_win();
 
     Box *get_box(int x, int y);
+    bool is_box(int x, int y);
+    bool is_player(int x, int y);
 
     //level in this box
     Box *father_box = nullptr;
