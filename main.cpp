@@ -109,12 +109,19 @@ int main() {
     box1->father_level = &level1;
     while (true) {
         player1.in_level->print_level_CIL();
-//        for (auto &box: player1.in_level->boxes) {
-//            if (box->is_has_internal_level){
-//                //std::cout<<"box "<<"in level "<<box->father_level->level_number<<" position: ("<<box->x<<","<<box->y<<")"<<std::endl;
-//                box->inter_level->print_level_CIL();
-//            }
-//        }
+        bool is_print[levels.size()];
+        for (int i = 0; i < levels.size(); i++) {
+            is_print[i] = false;
+        }
+        //print all box's internal level
+        for (auto & boxe : player1.in_level->boxes) {
+            if (boxe->is_has_internal_level){
+                if (!is_print[boxe->inter_level->level_number-1]){
+                    boxe->inter_level->print_level_CIL();
+                    is_print[boxe->inter_level->level_number-1]=true;
+                }
+            }
+        }
         int count = 0;
         for (auto level: levels) {
             if (!level->is_win()) {
