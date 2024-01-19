@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 Map::Map() = default;
@@ -32,7 +33,7 @@ std::vector<std::string> split(std::string str, std::string pattern) {
 }
 
 bool Map::draw_map(std::string img_info) {
-    std::vector<std::string> img_info_split = split(img_info, "\n");
+    std::vector<std::string> img_info_split = split(std::move(img_info), "\n");
     if (img_info_split.size() != height) {
         std::cout << "Error: the height of the map is not correct." << std::endl;
         return false;
@@ -53,7 +54,7 @@ bool Map::draw_map(std::string img_info) {
                 case '-':
                     map_units[i + 1][j + 1] = Unit(i + 1, j + 1, 5, " ");
                     break;
-                case ' ':
+                case '.':
                     map_units[i + 1][j + 1] = Unit(i + 1, j + 1, 6, " ");
                     break;
                 default:

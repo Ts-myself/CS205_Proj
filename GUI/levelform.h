@@ -22,6 +22,7 @@ public:
     void initLevel(int mode);
     void print_level_GUI(const Level &level);
     Level ownLevel;
+    int levelMode;
 
 protected:
     void keyPressEvent(QKeyEvent *ev);
@@ -29,6 +30,8 @@ protected:
 
 private slots:
     void on_quitBotton_clicked();
+
+    void on_resetBotton_clicked();
 
 private:
     Ui::levelForm *ui;

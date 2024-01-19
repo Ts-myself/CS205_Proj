@@ -14,6 +14,7 @@ public:
     Level(int level_number, Map &map, std::vector<Player> &players, std::vector<Box> &boxes);
 
     void print_level_CIL();
+    void load_level(const std::string& level_path);
 
     bool is_box(int x, int y, std::vector<Box> &boxes);
 

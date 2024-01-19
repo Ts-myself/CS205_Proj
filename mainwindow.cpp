@@ -25,16 +25,24 @@ void MainWindow::on_level1Botton_clicked()
 void MainWindow::on_level2Botton_clicked()
 {
     level2.show();
+    level2.initLevel(2);
     // this->hide();
 }
 void MainWindow::on_level3Botton_clicked()
 {
     level3.show();
+    level3.initLevel(3);
     // this->hide();
 }
 
 void MainWindow::on_quitBotton_clicked()
 {
     this->close();
+}
+
+
+void MainWindow::on_editLevelBotton_clicked()
+{
+
 }
 

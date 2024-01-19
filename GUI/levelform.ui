@@ -208,7 +208,7 @@
      <item row="1" column="2">
       <widget class="QLabel" name="label_55">
        <property name="text">
-        <string>1</string>
+        <string>TextLabel</string>
        </property>
       </widget>
      </item>
@@ -222,7 +222,7 @@
      <item row="0" column="0">
       <widget class="QLabel" name="label_20">
        <property name="text">
-        <string>1</string>
+        <string>TextLabel</string>
        </property>
       </widget>
      </item>
@@ -558,7 +558,7 @@
      <item row="1" column="0">
       <widget class="QLabel" name="label_50">
        <property name="text">
-        <string>1</string>
+        <string>TextLabel</string>
        </property>
       </widget>
      </item>
@@ -691,7 +691,7 @@
      <item row="2" column="0">
       <widget class="QLabel" name="label_48">
        <property name="text">
-        <string>1</string>
+        <string>TextLabel</string>
        </property>
       </widget>
      </item>
@@ -719,7 +719,14 @@
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="operationLayout">
+    <layout class="QVBoxLayout" name="sideLayout">
+     <item>
+      <widget class="QLabel" name="levelInfoLabel">
+       <property name="text">
+        <string>Level</string>
+       </property>
+      </widget>
+     </item>
      <item>
       <widget class="QLabel" name="label_101">
        <property name="text">

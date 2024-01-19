@@ -32,6 +32,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         data/user_pwd.txt
         GUI/levelform.h GUI/levelform.cpp GUI/levelform.ui
         data_source.qrc
+        GUI/editlevelform.h GUI/editlevelform.cpp GUI/editlevelform.ui
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET 1 APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

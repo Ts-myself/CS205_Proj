@@ -40,6 +40,8 @@ void levelForm::keyPressEvent(QKeyEvent *ev){
 
 //mode: 1-level1, 2-level1, 3-level3, 4-load editted level
 void levelForm::initLevel(int mode){
+    levelMode = mode;
+    ui->levelInfoLabel->setText(QString::fromStdString("level " + std::to_string(levelMode)));
     // todo: change by using loading files
     Map default_map(8, 8);
     Map test_internalBox_map(8, 8);
@@ -173,3 +175,9 @@ void levelForm::print_level_GUI(const Level &curLevel){
         }
     }
 };
+
+void levelForm::on_resetBotton_clicked()
+{
+    initLevel(levelMode);
+}
+
