@@ -23,6 +23,8 @@ public:
     void initLevel(int mode);
     void print_level_GUI(const Level &level);
     Level ownLevel;
+    std::vector<Level*> internal_levels;
+    std::vector<Box*> boxes;
     Player player;
     int levelMode;
 

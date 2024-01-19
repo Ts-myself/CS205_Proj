@@ -14,6 +14,12 @@ QWidget (parent)
 
 levelForm::~levelForm() {
     delete ui;
+    for (auto &level: internal_levels) {
+        delete level;
+    }
+    for (auto &box: boxes) {
+        delete box;
+    }
 }
 
 void levelForm::on_quitBotton_clicked() {
@@ -30,55 +36,34 @@ void levelForm::keyPressEvent(QKeyEvent *ev) {
     } else if (ev->key() == Qt::Key_D) {
         move::recurse_move(1, 0, player.x, player.y, nullptr, &player, player.in_level, 0);
     }
-    ownLevel.print_level_CIL();
-    print_level_GUI(ownLevel);
+    player.in_level->print_level_CIL();
+    print_level_GUI(*player.in_level);
 }
 
 //mode: 1-level1, 2-level1, 3-level3, 4-load editted level
 void levelForm::initLevel(int mode) {
     levelMode = mode;
-    ui->levelInfoLabel->setText(QString::fromStdString("level " + std::to_string(levelMode)));
-    // todo: change by using loading files
-    Map default_map(8, 8);
-    Map test_internalBox_map(8, 8);
-    std::vector<Level *> levels;
-    std::string default_map_str = "########\n"
-                                  "#------#\n"
-                                  "##-----#\n"
-                                  ".####--#\n"
-                                  "##--#--#\n"
-                                  "#------#\n"
-                                  "#----###\n"
-                                  "######..\n";
-    default_map.draw_map(default_map_str);
-    Player player1(7, 2, " ");
-    player = player1;
-    std::vector<Player *> default_players{&player};
-    std::vector<Box *> default_boxes;
-    Box box1(3, 2, "");
-    Box box2(4, 2, "");
-    Box box3(5, 2, "");
-    default_boxes.push_back(&box1);
-    default_boxes.push_back(&box2);
-    default_boxes.push_back(&box3);
-    Level level1(1, default_map, default_players, default_boxes);
-    std::string test_internalBox_map_str = "########\n"
-                                           "#------#\n"
-                                           "##-----#\n"
-                                           "#-------\n"
-                                           "##--#--#\n"
-                                           "#------#\n"
-                                           "#----###\n"
-                                           "########\n";
-    test_internalBox_map.draw_map(test_internalBox_map_str);
-    std::vector<Box*> test_internalBox_boxes;
-    std::vector<Player *> test_internalBox_players;
-    Level level2(2, test_internalBox_map, test_internalBox_players, test_internalBox_boxes);
-    player.in_level = &level1;
-    ownLevel = Level(1, default_map, default_players, default_boxes);
+    // ui->levelInfoLabel->setText(QString::fromStdString("level " + std::to_string(levelMode)));
+    Level initLevel;
+    ownLevel = initLevel;
+    internal_levels.clear();
+    boxes.clear();
+    if (mode == 1) {
+        std::string level1_path = "D:\\Data\\university\\Study\\Sophomore_Fisrt\\C++\\Proj\\CS205_Proj\\data\\level1.txt";
+        ownLevel.load_level(level1_path, internal_levels, boxes, player);
+    } else if (mode == 2) {
+        std::string level2_path = " ";
+        ownLevel.load_level(level2_path, internal_levels, boxes, player);
+    } else if (mode == 3) {
+        std::string level3_path = " ";
+        ownLevel.load_level(level3_path, internal_levels, boxes, player);
+    } else if (mode == 4) {
+        std::string edit_level_path = " ";
+        ownLevel.load_level(edit_level_path, internal_levels, boxes, player);
+    }
 
-    ownLevel.print_level_CIL();
-    print_level_GUI(ownLevel);
+    player.in_level->print_level_CIL();
+    print_level_GUI(*player.in_level);
 }
 
 void levelForm::print_level_GUI(const Level &curLevel) {
@@ -110,7 +95,7 @@ void levelForm::print_level_GUI(const Level &curLevel) {
             for (const auto &player: curLevel.players) {
                 if (player->x == j + 1 && player->y == i + 1) {
                     isPlayer = true;
-                    if (curLevel.map.map_units[player->x][player->y].type == 3) {
+                    if (curLevel.map.map_units[player->x][player->y].type == 4) {
                         std::string img_path = imgs_path + "\\playerAtCheckPoint.png";
                         pic.load(QString::fromStdString(img_path));
                     } else {
@@ -123,7 +108,7 @@ void levelForm::print_level_GUI(const Level &curLevel) {
             for (const auto &box: curLevel.boxes) {
                 if (box->x == j + 1 && box->y == i + 1) {
                     isBox = true;
-                    if (curLevel.map.map_units[box->x][box->y].type == 4) {
+                    if (curLevel.map.map_units[box->x][box->y].type == 3) {
                         std::string img_path = imgs_path + "\\boxAtCheckPoint.png";
                         pic.load(QString::fromStdString(img_path));
                     } else {

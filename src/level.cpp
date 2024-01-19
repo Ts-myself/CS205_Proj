@@ -152,7 +152,9 @@ struct Point2 {
     int y;
 };
 
-void Level::load_level(const std::string &level_path) {
+void
+Level::load_level(const std::string &level_path, std::vector<Level *> &internal_levels_, std::vector<Box *> &boxes_,
+                  Player &player_) {
     std::ifstream level_file(level_path);
     if (!level_file.is_open()) {
         std::cout << "Error: the level file cannot be opened." << std::endl;
@@ -170,17 +172,13 @@ void Level::load_level(const std::string &level_path) {
 
     int internal_level_number;
     std::vector<int> level_belong_box;
-    std::vector<Level> internal_levels;
 
     int boxes_num;
     std::vector<int> boxes_in_level;
-    std::vector<Point2> boxes_pos;
     std::vector<int> boxes_enter;
     std::vector<Point2> boxes_enter_pos;
 
     int players_num;
-    std::vector<int> players_in_level;
-    std::vector<Point2> players_pos;
 
     int offsetLine = 0;
     // origin level
@@ -191,6 +189,7 @@ void Level::load_level(const std::string &level_path) {
     offsetLine += 1;
     for (int i = 0; i < origin_map_height; i++) {
         origin_map_info += level_info[offsetLine + i];
+        origin_map_info += '\n';
     }
     Map origin_map(origin_map_width, origin_map_height);
     origin_map.draw_map(origin_map_info);
@@ -201,19 +200,30 @@ void Level::load_level(const std::string &level_path) {
     internal_level_number = std::stoi(level_info[offsetLine]);
     offsetLine += 1;
     for (int i = 0; i < internal_level_number; i++) {
+        // level belong to box
         level_belong_box.push_back(std::stoi(level_info[offsetLine]));
         offsetLine += 1;
+        // width height
         std::vector<int> internal_level_info = line_to_int(level_info[offsetLine]);
         int internal_map_width = internal_level_info[0];
         int internal_map_height = internal_level_info[1];
         offsetLine += 1;
+        // enter direction, position to enter
+        std::vector<int> internal_level_enter = line_to_int(level_info[offsetLine]);
+        boxes_enter.push_back(internal_level_enter[0]);
+        boxes_enter_pos.push_back({internal_level_enter[1], internal_level_enter[2]});
+        offsetLine += 1;
+        // map
         std::string temp_internal_map_info;
         for (int j = 0; j < internal_map_height; j++) {
             temp_internal_map_info += level_info[offsetLine + j];
+            temp_internal_map_info += '\n';
         }
         Map internal_map(internal_map_width, internal_map_height);
         internal_map.draw_map(temp_internal_map_info);
-        internal_levels.emplace_back(i, internal_map, std::vector<Player>{}, std::vector<Box>{});
+        std::vector<Player *> vec_players;
+        std::vector<Box *> vec_boxes;
+        internal_levels_.push_back(new Level(i, internal_map, vec_players, vec_boxes));
         offsetLine += internal_map_height;
     }
 
@@ -223,9 +233,51 @@ void Level::load_level(const std::string &level_path) {
     offsetLine += 1;
     for (int i = 0; i < boxes_num; i++) {
         std::vector<int> box_info = line_to_int(level_info[offsetLine]);
+        boxes_.push_back(new Box(box_info[1], box_info[2], " "));
         boxes_in_level.push_back(box_info[0]);
-        boxes_pos.push_back({box_info[1], box_info[2]});
+        if (box_info[0] == -1) {
+            boxes.emplace_back(boxes_.back());
+        } else {
+            internal_levels_[box_info[0]]->boxes.push_back(boxes_.back());
+        }
+        if (box_info[3] != -1) {
+            boxes_.back()->father_box = boxes_[box_info[3]];
+        }
+        boxes_.back()->enter_direction = boxes_enter[boxes_.size() - 1];
+        boxes_.back()->position_to_enter[0] = boxes_enter_pos[boxes_.size() - 1].x;
+        boxes_.back()->position_to_enter[1] = boxes_enter_pos[boxes_.size() - 1].y;
         offsetLine += 1;
+    }
+
+    // players
+    offsetLine += 1; // offset "Players:"
+    players_num = std::stoi(level_info[offsetLine]);
+    offsetLine += 1;
+    for (int i = 0; i < players_num; i++) {
+        std::vector<int> player_info = line_to_int(level_info[offsetLine]);
+        if (player_info[0] == -1) {
+            player_.in_level = this;
+            players.push_back(&player_);
+        } else {
+            internal_levels_[player_info[0]]->players.push_back(&player_);
+            player_.in_level = internal_levels_[player_info[0]];
+        }
+        player_.x = player_info[1];
+        player_.y = player_info[2];
+        offsetLine += 1;
+    }
+
+    // internal level belong to box
+    for (int i = 0; i < level_belong_box.size(); i++) {
+        int belong_box = level_belong_box[i];
+        internal_levels_[i]->father_box = boxes_[belong_box];
+        boxes_[belong_box]->inter_level = internal_levels_[i];
+        boxes_[belong_box]->is_has_internal_level = true;
+        if (boxes_in_level[belong_box] == -1) {
+            internal_levels_[i]->father_level = this;
+        } else {
+            internal_levels_[i]->father_level = internal_levels_[boxes_in_level[belong_box]];
+        }
     }
 
 
@@ -263,91 +315,15 @@ void Level::load_level(const std::string &level_path) {
      * ####
      * Boxes:
      * 4 //number of boxes
-     * 0 3 2 // in nth level, x, y
-     * 0 6 2
-     * 0 3 5
-     * 1 4 2
+     * -1 3 2 -1// in nth level, x, y, father_box
+     * -1 6 2 -1
+     * -1 3 5 -1
+     * 0 4 2 -1
      * Players:
      * 1 // number of player
-     * 0 5 2 // in nth level, x, y
+     * -1 5 2 // in nth level, x, y
      */
 
-//    std::vector<Level *> levels_ptr;
-//    // map of origin level
-//    int origin_map_width = std::stoi(level_info[1].substr(0, level_info[1].find(' ')));
-//    int origin_map_height = std::stoi(level_info[1].substr(level_info[1].find(' ') + 1));
-//    Map origin_map(origin_map_width, origin_map_height);
-//    std::string origin_map_info;
-//    for (int i = 2; i < 2 + origin_map_height; i++) {
-//        origin_map_info += level_info[i];
-//    }
-//    origin_map.draw_map(origin_map_info);
-//    {
-//        map = origin_map;
-//        levels_ptr.push_back(this);
-//    }
-//
-//    // internal levels
-//    int internal_level_number = std::stoi(level_info[2 + origin_map_height]);
-//    int offsetLine = 3 + origin_map_height;
-//    std::vector<int> level_belong_box;
-//    for (int i = 0; i < internal_level_number; i++) {
-//        int belong_box = std::stoi(level_info[offsetLine]);
-//        level_belong_box.push_back(belong_box);
-//        int internal_map_width = std::stoi(level_info[offsetLine + 1].substr(0, level_info[offsetLine + 1].find(' ')));
-//        int internal_map_height = std::stoi(
-//                level_info[offsetLine + 1].substr(level_info[offsetLine + 1].find(' ') + 1));
-//        Map internal_map(internal_map_width, internal_map_height);
-//
-//        std::string internal_map_info;
-//        for (int j = 0; j < internal_map_height; j++) {
-//            internal_map_info += level_info[offsetLine + 2 + i];
-//        }
-//        internal_map.draw_map(internal_map_info);
-//        offsetLine += 2 + internal_map_height;
-//    }
-//
-//    // boxes
-//    std::vector<Box> belong_boxes;
-//    offsetLine += 1; // offset "Boxes:"
-//    int boxes_num = std::stoi(level_info[offsetLine]);
-//    for (int i = 0; i < boxes_num; i++) {
-//        int be_in_level = std::stoi(level_info[offsetLine + 1].substr(0, level_info[offsetLine + 1].find(' ')));
-//        int box_x = std::stoi(level_info[offsetLine + 1].substr(level_info[offsetLine + 1].find(' ') + 1,
-//                                                                level_info[offsetLine + 1].rfind(' ') -
-//                                                                level_info[offsetLine + 1].find(' ') - 1));
-//        int box_y = std::stoi(level_info[offsetLine + 1].substr(level_info[offsetLine + 1].rfind(' ') + 1));
-//        Box box(box_x, box_y, " ");
-//        belong_boxes.push_back(box);
-//        //todo: box father_box
-////        box.father_level = levels_ptr[be_in_level];
-//        levels_ptr[be_in_level]->boxes.push_back(box);
-//        offsetLine += 1;
-//    }
-//
-//    // players
-//    offsetLine += 1; // offset "Players:"
-//    int players_num = std::stoi(level_info[offsetLine]);
-//    for (int i = 0; i < players_num; i++) {
-//        int be_in_level = std::stoi(level_info[offsetLine + 1].substr(0, level_info[offsetLine + 1].find(' ')));
-//        int player_x = std::stoi(level_info[offsetLine + 1].substr(level_info[offsetLine + 1].find(' ') + 1,
-//                                                                   level_info[offsetLine + 1].rfind(' ') -
-//                                                                   level_info[offsetLine + 1].find(' ') - 1));
-//        int player_y = std::stoi(level_info[offsetLine + 1].substr(level_info[offsetLine + 1].rfind(' ') + 1));
-//        Player player(player_x, player_y, " ");
-//        //todo: player where
-//        levels_ptr[be_in_level]->players.push_back(player);
-//        offsetLine += 1;
-//    }
-//
-//    //internal level belong to box
-//    for (int i = 0; i < internal_level_number; i++) {
-//        int belong_box = level_belong_box[i];
-//        levels_ptr[i]->father_box = std::make_unique<Box>(belong_boxes[belong_box]);
-//        //todo: fix below
-////        std::shared_ptr<Level> temp_level_ptr = std::make_shared<Level>(*levels_ptr[i]);
-////        belong_boxes[belong_box].inter_level = std::make_shared<Level>(*levels_ptr[i]);
-//    }
 };
 
 // 0: not movable, 1: movable, 2: movable and push box,
