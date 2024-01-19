@@ -6,7 +6,7 @@
 
 Level::Level() {};
 
-Level::Level(int level_number, Map &map, std::vector<Player*> &players, std::vector<Box*> &boxes) {
+Level::Level(int level_number, Map &map, std::vector<Player *> &players, std::vector<Box *> &boxes) {
     this->level_number = level_number;
     this->map = map;
     this->players = players;
@@ -132,58 +132,146 @@ void Level::print_level_CIL() {
     }
 }
 
-//void Level::load_level(const std::string &level_path) {
-//    std::ifstream level_file(level_path);
-//    if (!level_file.is_open()) {
-//        std::cout << "Error: the level file cannot be opened." << std::endl;
-//        return;
-//    }
-//    std::string line;
-//    std::vector<std::string> level_info;
-//    while (getline(level_file, line)) {
-//        level_info.push_back(line);
-//    }
-//    level_file.close();
-//    // the format of the level file is as follows:
-//    /* Levels:
-//     * 8 8 // origin width height
-//     * ########
-//     * #=---@-#
-//     * #-=----#
-//     * #------#
-//     * #------#
-//     * ####--##
-//     * ..#--#..
-//     * ..####..
-//     * 3 // internal level number
-//     * 0 // belong to nth box
-//     * 4 6 // width height
-//     * ######
-//     * #-=---
-//     * #-----
-//     * ######
-//     * 1
-//     * 3 4
-//     * ####
-//     * #--#
-//     * #--#
-//     * 3
-//     * 4 4
-//     * #--#
-//     * #--#
-//     * #--#
-//     * ####
-//     * Boxes:
-//     * 4 //number of boxes
-//     * 0 3 2 // in nth level, x, y
-//     * 0 6 2
-//     * 0 3 5
-//     * 1 4 2
-//     * Players:
-//     * 1 // number of player
-//     * 0 5 2 // in nth level, x, y
-//     */
-//
+std::vector<int> line_to_int(std::string line) {
+    std::vector<int> result;
+    std::string temp;
+    for (auto i: line) {
+        if (i == ' ') {
+            result.push_back(std::stoi(temp));
+            temp = "";
+        } else {
+            temp += i;
+        }
+    }
+    result.push_back(std::stoi(temp));
+    return result;
+}
+
+struct Point2 {
+    int x;
+    int y;
+};
+
+void Level::load_level(const std::string &level_path) {
+    std::ifstream level_file(level_path);
+    if (!level_file.is_open()) {
+        std::cout << "Error: the level file cannot be opened." << std::endl;
+        return;
+    }
+    std::string line;
+    std::vector<std::string> level_info;
+    while (getline(level_file, line)) {
+        level_info.push_back(line);
+    }
+    level_file.close();
+
+    int origin_map_width, origin_map_height;
+    std::string origin_map_info;
+
+    int internal_level_number;
+    std::vector<int> level_belong_box;
+    std::vector<Level> internal_levels;
+
+    int boxes_num;
+    std::vector<int> boxes_in_level;
+    std::vector<Point2> boxes_pos;
+    std::vector<int> boxes_enter;
+    std::vector<Point2> boxes_enter_pos;
+
+    int players_num;
+    std::vector<int> players_in_level;
+    std::vector<Point2> players_pos;
+
+    int offsetLine = 0;
+    // origin level
+    offsetLine += 1; // offset "Levels:"
+    std::vector<int> origin_level_info = line_to_int(level_info[offsetLine]);
+    origin_map_width = origin_level_info[0];
+    origin_map_height = origin_level_info[1];
+    offsetLine += 1;
+    for (int i = 0; i < origin_map_height; i++) {
+        origin_map_info += level_info[offsetLine + i];
+    }
+    Map origin_map(origin_map_width, origin_map_height);
+    origin_map.draw_map(origin_map_info);
+    map = origin_map;
+    offsetLine += origin_map_height;
+
+    // internal levels
+    internal_level_number = std::stoi(level_info[offsetLine]);
+    offsetLine += 1;
+    for (int i = 0; i < internal_level_number; i++) {
+        level_belong_box.push_back(std::stoi(level_info[offsetLine]));
+        offsetLine += 1;
+        std::vector<int> internal_level_info = line_to_int(level_info[offsetLine]);
+        int internal_map_width = internal_level_info[0];
+        int internal_map_height = internal_level_info[1];
+        offsetLine += 1;
+        std::string temp_internal_map_info;
+        for (int j = 0; j < internal_map_height; j++) {
+            temp_internal_map_info += level_info[offsetLine + j];
+        }
+        Map internal_map(internal_map_width, internal_map_height);
+        internal_map.draw_map(temp_internal_map_info);
+        internal_levels.emplace_back(i, internal_map, std::vector<Player>{}, std::vector<Box>{});
+        offsetLine += internal_map_height;
+    }
+
+    // boxes
+    offsetLine += 1; // offset "Boxes:"
+    boxes_num = std::stoi(level_info[offsetLine]);
+    offsetLine += 1;
+    for (int i = 0; i < boxes_num; i++) {
+        std::vector<int> box_info = line_to_int(level_info[offsetLine]);
+        boxes_in_level.push_back(box_info[0]);
+        boxes_pos.push_back({box_info[1], box_info[2]});
+        offsetLine += 1;
+    }
+
+
+    // the format of the level file is as follows:
+    /* Levels:
+     * 8 8 // origin width height
+     * ########
+     * #=---@-#
+     * #-=----#
+     * #------#
+     * #------#
+     * ####--##
+     * ..#--#..
+     * ..####..
+     * 3 // internal level number
+     * 0 // belong to nth box
+     * 4 6 // width height
+     * 4 6 2 //enter direction, position to enter
+     * ######
+     * #-=---
+     * #-----
+     * ######
+     * 1
+     * 3 4
+     * 2 2 3
+     * ####
+     * #--#
+     * #--#
+     * 3
+     * 4 4
+     * 1 2 1
+     * #--#
+     * #--#
+     * #--#
+     * ####
+     * Boxes:
+     * 4 //number of boxes
+     * 0 3 2 // in nth level, x, y
+     * 0 6 2
+     * 0 3 5
+     * 1 4 2
+     * Players:
+     * 1 // number of player
+     * 0 5 2 // in nth level, x, y
+     */
+
 //    std::vector<Level *> levels_ptr;
 //    // map of origin level
 //    int origin_map_width = std::stoi(level_info[1].substr(0, level_info[1].find(' ')));
@@ -260,7 +348,7 @@ void Level::print_level_CIL() {
 ////        std::shared_ptr<Level> temp_level_ptr = std::make_shared<Level>(*levels_ptr[i]);
 ////        belong_boxes[belong_box].inter_level = std::make_shared<Level>(*levels_ptr[i]);
 //    }
-//};
+};
 
 // 0: not movable, 1: movable, 2: movable and push box,
 // 3 : out of internal level, 4+: enter internal level,value - 4 is which box is be entered
@@ -487,12 +575,12 @@ Box *Level::get_box(int x, int y) {
 bool Level::is_win() {
     rew_state_All();
     for (auto &box: boxes) {
-        if (box->state==0) {
+        if (box->state == 0) {
             return false;
         }
     }
     for (auto &player: players) {
-        if (player->state==0) {
+        if (player->state == 0) {
             return false;
         }
     }
