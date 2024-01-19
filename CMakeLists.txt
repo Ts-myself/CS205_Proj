@@ -22,6 +22,7 @@ set(PROJECT_SOURCES
         ./src/map.cpp
         ./src/player.cpp
         ./src/unit.cpp
+        ./src/move.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

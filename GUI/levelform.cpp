@@ -1,5 +1,6 @@
 #include "levelform.h"
 #include "ui_levelform.h"
+#include "../include/move.hpp"
 
 #include <QLabel>
 
@@ -22,17 +23,13 @@ void levelForm::on_quitBotton_clicked()
 
 void levelForm::keyPressEvent(QKeyEvent *ev){
     if(ev->key() == Qt::Key_W){
-        int movable = ownLevel.player_movable(0, 0, -1);
-        ownLevel.player_move(0, 0, -1, movable);
+        move::recurse_move(0,-1,player.x,player.y, nullptr,&player,player.in_level,0);
     } else if(ev->key() == Qt::Key_A){
-        int movable = ownLevel.player_movable(0, -1, 0);
-        ownLevel.player_move(0, -1, 0, movable);
+        move::recurse_move(-1,0,player.x,player.y, nullptr,&player,player.in_level,0);
     } else if(ev->key() == Qt::Key_S){
-        int movable = ownLevel.player_movable(0, 0, 1);
-        ownLevel.player_move(0, 0, 1, movable);
+        move::recurse_move(0,1,player.x,player.y, nullptr,&player,player.in_level,0);
     } else if(ev->key() == Qt::Key_D){
-        int movable = ownLevel.player_movable(0, 1, 0);
-        ownLevel.player_move(0, 1, 0, movable);
+        move::recurse_move(1,0,player.x,player.y, nullptr,&player,player.in_level,0);
     }
     ownLevel.print_level_CIL();
     print_level_GUI(ownLevel);
@@ -45,6 +42,7 @@ void levelForm::initLevel(int mode){
     // todo: change by using loading files
     Map default_map(8, 8);
     Map test_internalBox_map(8, 8);
+    std::vector<Level*> levels;
     std::string default_map_str = "########\n"
                                   "#------#\n"
                                   "##-----#\n"
@@ -54,11 +52,14 @@ void levelForm::initLevel(int mode){
                                   "#----###\n"
                                   "######  \n";
     default_map.draw_map(default_map_str);
-
-    std::vector<Player> default_players{Player(4, 2, " ")};
+    Player player1(7, 2, " ");
+    Player* player1_ptr = &player1;
+    std::vector<Player*> default_players{player1_ptr};
     std::vector<Box> default_boxes;
     default_boxes.push_back(Box(3, 2, " "));
-    default_boxes.push_back(Box(6, 2, " "));
+    default_boxes.push_back(Box(4, 2, " "));
+    default_boxes.push_back(Box(5, 2, " "));
+    Level level1(1, default_map, default_players, default_boxes);
     std::string test_internalBox_map_str = "########\n"
                                            "#------#\n"
                                            "##-----#\n"
@@ -67,17 +68,11 @@ void levelForm::initLevel(int mode){
                                            "#------#\n"
                                            "#----###\n"
                                            "########\n";
-
     test_internalBox_map.draw_map(test_internalBox_map_str);
-    std::vector<Player> test_internalBox_players;
     std::vector<Box> test_internalBox_boxes;
-    default_boxes[0].inter_level = std::make_shared<Level>(2, test_internalBox_map,
-                                                           test_internalBox_players, test_internalBox_boxes);
-    default_boxes[0].is_has_internal_level = true;
-    default_boxes[0].enter_direction = 4;
-    default_boxes[0].position_to_enter[0] = 8;
-    default_boxes[0].position_to_enter[1] = 4;
-    default_boxes[0].inter_level->father_box = std::make_unique<Box>(default_boxes[0]);
+    std::vector<Player*> test_internalBox_players;
+    Level level2(2, test_internalBox_map, test_internalBox_players, test_internalBox_boxes);
+    player1.in_level = &level1;
     ownLevel = Level(1, default_map, default_players, default_boxes);
 
     ownLevel.print_level_CIL();
@@ -111,9 +106,9 @@ void levelForm::print_level_GUI(const Level &curLevel){
 
             bool isPlayer=false, isBox =false;
             for (const auto &player: curLevel.players) {
-                if(player.x == j+1 && player.y == i+1){
+                if(player->x == j+1 && player->y == i+1){
                     isPlayer = true;
-                    if (curLevel.map.map_units[player.x][player.y].type == 3) {
+                    if (curLevel.map.map_units[player->x][player->y].type == 3) {
                         std::string img_path = imgs_path + "\\playerAtCheckPoint.png";
                         pic.load(QString::fromStdString(img_path));
                     } else {
