@@ -50,6 +50,9 @@ bool Map::draw_map(std::string img_info) {
                 case '=':
                     map_units[i + 1][j + 1] = Unit(i + 1, j + 1, 3, " ");
                     break;
+                case '@':
+                    map_units[i + 1][j + 1] = Unit(i + 1, j + 1, 4, " ");
+                    break;
                 case '-':
                     map_units[i + 1][j + 1] = Unit(i + 1, j + 1, 5, " ");
                     break;

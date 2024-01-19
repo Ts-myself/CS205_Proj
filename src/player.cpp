@@ -20,5 +20,6 @@ Player &Player::operator=(const Player &other) {
     state = other.state;
     in_level = other.in_level;
     return *this;
-};
+}
+
 

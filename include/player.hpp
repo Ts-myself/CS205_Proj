@@ -14,4 +14,6 @@ public:
     void move(int dx, int dy);
     //player in this level
     Level * in_level = nullptr;
+    std::shared_ptr<Level> in_level_ptr = nullptr;
+    void keep_same();
 };
