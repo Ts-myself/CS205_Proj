@@ -11,10 +11,10 @@ namespace move {
             std::cout << " inf box! Overflow!" << std::endl;
 
             if (box != nullptr) {
-                std::cout << "box x: " << box->x << " box y: " << box->y  <<"enter empty space"<<std::endl;
+                std::cout << "box x: " << box->x << " box y: " << box->y << "enter empty space" << std::endl;
                 level->boxes.erase(level->boxes.begin() + get_box_index(box->x, box->y, level->boxes));
             } else {
-                std::cout << "player1 x: " << player->x << " y: " << player->y  <<" enter empty space"<<std::endl;
+                std::cout << "player1 x: " << player->x << " y: " << player->y << " enter empty space" << std::endl;
                 level->players.erase(level->players.begin());
                 player->in_level = nullptr;
             }
@@ -32,9 +32,10 @@ namespace move {
         int height = level->map.height;
         if (level->level_number == 0) {
             if (box != nullptr) {
-                std::cout << "box x: " << box->x << " box y: " << box->y  <<"enter empty space"<<std::endl;
+                std::cout << "box x: " << box->x << " box y: " << box->y << "enter empty space" << std::endl;
             } else {
-                std::cout << "player x: " << player->x << " player y: " << player->y  <<"enter empty space"<<std::endl;
+                std::cout << "player x: " << player->x << " player y: " << player->y << "enter empty space"
+                          << std::endl;
             }
             return false;
         }
@@ -49,10 +50,10 @@ namespace move {
         if (next_x <= 0 || next_x > width || next_y <= 0 || next_y > height) {
             if (level->father_box == nullptr) {
                 if (box != nullptr) {
-                    std::cout << "box x: " << box->x << " box y: " << box->y  <<" enter empty space"<<std::endl;
+                    std::cout << "box x: " << box->x << " box y: " << box->y << " enter empty space" << std::endl;
                     level->boxes.erase(level->boxes.begin() + get_box_index(box->x, box->y, level->boxes));
                 } else {
-                    std::cout << "player1 x: " << player->x << " y: " << player->y  <<"enter empty space"<<std::endl;
+                    std::cout << "player1 x: " << player->x << " y: " << player->y << "enter empty space" << std::endl;
                     level->players.erase(level->players.begin());
                     player->in_level = nullptr;
                 }
@@ -62,16 +63,16 @@ namespace move {
             int enter_y = level->father_box->y;
             Player *temp_player = nullptr;
             Box *temp_box = nullptr;
-            if (is_player(next_x-dx, next_y-dy, level->players)) {
+            if (is_player(next_x - dx, next_y - dy, level->players)) {
                 temp_player = level->players[0];
                 level->players.erase(level->players.begin());
                 level->father_level->players.push_back(temp_player);
                 player->in_level = level->father_level;
                 player->x = enter_x;
                 player->y = enter_y;
-            } else{
-                temp_box = level->get_box(next_x-dx, next_y-dy);
-                level->boxes.erase(level->boxes.begin() + get_box_index(next_x-dx, next_y-dy, level->boxes));
+            } else {
+                temp_box = level->get_box(next_x - dx, next_y - dy);
+                level->boxes.erase(level->boxes.begin() + get_box_index(next_x - dx, next_y - dy, level->boxes));
                 temp_box->x = enter_x;
                 temp_box->y = enter_y;
                 level->father_level->boxes.push_back(temp_box);
@@ -91,7 +92,7 @@ namespace move {
                     unit->move(dx, dy);
                 }
             }
-           return recurse_move(dx, dy, enter_x, enter_y, temp_box, temp_player, level->father_level, count + 1);
+            return recurse_move(dx, dy, enter_x, enter_y, temp_box, temp_player, level->father_level, count + 1);
 
         }
         int next_type = level->map.map_units[next_y][next_x].type;
@@ -149,14 +150,14 @@ namespace move {
                     }
                 }
                 return recurse_move(dx, dy, temp_box->position_to_enter[0] - dx,
-                             temp_box->position_to_enter[1] - dy,
-                             temp_box1, player, temp_box->inter_level, count + 1);
+                                    temp_box->position_to_enter[1] - dy,
+                                    temp_box1, player, temp_box->inter_level, count + 1);
 
             }
             std::cout << "player can't move" << std::endl;
             return false;
         }
-        if (next_type == 6 || next_type == 5 || next_type == 4 || next_type == 3||next_type==0) {
+        if (next_type == 6 || next_type == 5 || next_type == 4 || next_type == 3 || next_type == 0) {
             std::vector<Unit *> units;
             int temp_x = x;
             int temp_y = y;
@@ -176,7 +177,7 @@ namespace move {
         }
     }
 
-    bool is_box(int x, int y, std::vector<Box*> &boxes) {
+    bool is_box(int x, int y, std::vector<Box *> &boxes) {
         for (auto &box: boxes) {
             if (box->x == x && box->y == y) {
                 return true;
@@ -184,7 +185,8 @@ namespace move {
         }
         return false;
     }
-    int get_box_index(int x, int y, std::vector<Box*> &boxes) {
+
+    int get_box_index(int x, int y, std::vector<Box *> &boxes) {
         for (int i = 0; i < boxes.size(); i++) {
             if (boxes[i]->x == x && boxes[i]->y == y) {
                 return i;
