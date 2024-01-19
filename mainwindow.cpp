@@ -18,6 +18,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_level1Botton_clicked()
 {
     level1.show();
+    level1.initLevel(1);
     // this->hide();
 }
 
