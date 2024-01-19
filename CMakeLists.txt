@@ -12,7 +12,9 @@ include_directories(C:/Qt/6.6.1/mingw_64/include/QtWidgets)
 aux_source_directory(./src PROJECT_SOURCES)
 aux_source_directory(./include PROJECT_INCLUDES)
 
-add_executable(CS205_Proj main.cpp ${PROJECT_SOURCES})
+add_executable(CS205_Proj main.cpp ${PROJECT_SOURCES}
+        src/move.cpp
+        include/move.hpp)
 
 
 #project(CS205_Proj VERSION 0.1 LANGUAGES CXX)

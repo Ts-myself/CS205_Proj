@@ -16,19 +16,20 @@ public:
 
     Box(const Box &other);
 
+    Box(int x, int y, std::string img_path, int enter_direction, int *position_to_enter,
+        bool is_has_internal_level,
+        Level *inter_level, Box *father_box);
+
+    Box &operator=(const Box &other);
 
 
     void move(int dx, int dy);
 
-    Box &operator=(const Box &other);
-
     bool is_has_internal_level;
     int enter_direction = 0; // 1: up, 2: down, 3: left, 4: right
-    int position_to_enter[2]{};
+    int position_to_enter[2];
     // box has this level
-    std::shared_ptr<Level> inter_level = nullptr;
+    Level * inter_level = nullptr;
     // box in this box
-    std::shared_ptr<Box> father_box = nullptr;
-    // box in this level
-    std::shared_ptr<Level> father_level = nullptr;
+    Box *father_box = nullptr;
 };
