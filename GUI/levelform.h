@@ -2,6 +2,7 @@
 #define LEVELFORM_H
 
 #include "../include/level.hpp"
+#include "../include/player.hpp"
 
 #include <QWidget>
 #include <QKeyEvent>
@@ -22,6 +23,7 @@ public:
     void initLevel(int mode);
     void print_level_GUI(const Level &level);
     Level ownLevel;
+    Player player;
     int levelMode;
 
 protected:

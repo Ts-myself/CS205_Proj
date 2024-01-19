@@ -220,6 +220,7 @@ void Level::load_level(const std::string &level_path) {
     }
 
     // boxes
+    std::vector<Box> belong_boxes;
     offsetLine += 1; // offset "Boxes:"
     int boxes_num = std::stoi(level_info[offsetLine]);
     for (int i = 0; i < boxes_num; i++) {
@@ -229,6 +230,35 @@ void Level::load_level(const std::string &level_path) {
                                                                 level_info[offsetLine + 1].find(' ') - 1));
         int box_y = std::stoi(level_info[offsetLine + 1].substr(level_info[offsetLine + 1].rfind(' ') + 1));
         Box box(box_x, box_y, " ");
+        belong_boxes.push_back(box);
+        //todo: box father_box
+//        box.father_level = levels_ptr[be_in_level];
+        levels_ptr[be_in_level]->boxes.push_back(box);
+        offsetLine += 1;
+    }
+
+    // players
+    offsetLine += 1; // offset "Players:"
+    int players_num = std::stoi(level_info[offsetLine]);
+    for (int i = 0; i < players_num; i++) {
+        int be_in_level = std::stoi(level_info[offsetLine + 1].substr(0, level_info[offsetLine + 1].find(' ')));
+        int player_x = std::stoi(level_info[offsetLine + 1].substr(level_info[offsetLine + 1].find(' ') + 1,
+                                                                   level_info[offsetLine + 1].rfind(' ') -
+                                                                   level_info[offsetLine + 1].find(' ') - 1));
+        int player_y = std::stoi(level_info[offsetLine + 1].substr(level_info[offsetLine + 1].rfind(' ') + 1));
+        Player player(player_x, player_y, " ");
+        //todo: player where
+        levels_ptr[be_in_level]->players.push_back(player);
+        offsetLine += 1;
+    }
+
+    //internal level belong to box
+    for (int i = 0; i < internal_level_number; i++) {
+        int belong_box = level_belong_box[i];
+        levels_ptr[i]->father_box = std::make_unique<Box>(belong_boxes[belong_box]);
+        //todo: fix below
+//        std::shared_ptr<Level> temp_level_ptr = std::make_shared<Level>(*levels_ptr[i]);
+//        belong_boxes[belong_box].inter_level = std::make_shared<Level>(*levels_ptr[i]);
     }
 };
 
