@@ -43,6 +43,7 @@ void MainWindow::on_quitBotton_clicked()
 
 void MainWindow::on_editLevelBotton_clicked()
 {
-
+    editForm.show();
+    editForm.init();
 }
 

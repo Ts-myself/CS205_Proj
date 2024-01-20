@@ -15,6 +15,8 @@ public:
     explicit editLevelForm(QWidget *parent = nullptr);
     ~editLevelForm();
 
+    void init();
+
 private:
     Ui::editLevelForm *ui;
 };

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "GUI/levelform.h"
+#include "GUI/editlevelform.h"
 
 #include <QMainWindow>
 #include <vector>
@@ -22,6 +23,7 @@ public:
     levelForm level1;
     levelForm level2;
     levelForm level3;
+    editLevelForm editForm;
     std::vector<levelForm> edittedLevel;
 
 private slots:
