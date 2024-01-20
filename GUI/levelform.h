@@ -21,7 +21,7 @@ public:
     ~levelForm();
 
     void initLevel(int mode);
-    void print_level_GUI(const Level &level);
+    void print_level_GUI(const Level &level, const Player &player);
     Level ownLevel;
     std::vector<Level*> internal_levels;
     std::vector<Box*> boxes;

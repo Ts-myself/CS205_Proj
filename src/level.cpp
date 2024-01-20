@@ -308,10 +308,11 @@ Level::load_level(const std::string &level_path, std::vector<Level *> &internal_
     // box copy and father
     for(int i=0;i<boxes_fa.size();i++){
         if(boxes_fa[i]>=0){
-            Box box_copy = *boxes_[boxes_fa[i]];
-            boxes_[i] = &box_copy;
-            boxes_[i]->x = boxes_copy_pos[i].x;
-            boxes_[i]->y = boxes_copy_pos[i].y;
+            boxes_[i]->enter_direction = boxes_[boxes_fa[i]]->enter_direction;
+            boxes_[i]->position_to_enter[0] = boxes_[boxes_fa[i]]->position_to_enter[0];
+            boxes_[i]->position_to_enter[1] = boxes_[boxes_fa[i]]->position_to_enter[1];
+            boxes_[i]->is_has_internal_level=true;
+            boxes_[i]->inter_level = boxes_[boxes_fa[i]]->inter_level;
         }
     }
 

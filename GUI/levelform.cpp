@@ -39,29 +39,29 @@ void levelForm::keyPressEvent(QKeyEvent *ev) {
     } else if (ev->key() == Qt::Key_D) {
         move::recurse_move(1, 0, player.x, player.y, nullptr, &player, player.in_level, 0);
     }
-    if (player.in_level==nullptr) {
+    if (player.in_level == nullptr) {
         std::cout << "You lose!" << std::endl;
         QMessageBox::information(this, tr("Lose"),
-                             tr("You lose!"),
-                             QMessageBox::Yes);
+                                 tr("You lose!"),
+                                 QMessageBox::Yes);
         this->close();
         return;
     }
     player.in_level->print_level_CIL();
-    print_level_GUI(*player.in_level);
+    print_level_GUI(*player.in_level, player);
     int count = 0;
     for (auto level: internal_levels) {
         if (!level->is_win()) {
             break;
         } else count++;
     }
-    if(ownLevel.is_win())
+    if (ownLevel.is_win())
         count++;
     if (count == internal_levels.size() + 1) {
         std::cout << "You win!" << std::endl;
         QMessageBox::information(this, tr("Win"),
-                             tr("You win!"),
-                             QMessageBox::Yes);
+                                 tr("You win!"),
+                                 QMessageBox::Yes);
         this->close();
     }
 }
@@ -88,7 +88,11 @@ void levelForm::initLevel(int mode) {
     } else if (mode == 2) {
         std::string level2Info = "Level 2\n\n"
                                  "Show Recursive Box\n"
-                                 "GO out of A, then out of B\n";
+                                 "GO out of A, then out of B\n\n"
+                                 "Recursive overflow\n"
+                                 "Greedy Snake\n"
+                                 "Multiple reference\n"
+                                 "(Use reset to implment the above stuations)";
         ui->levelInfoLabel->setText(QString::fromStdString(level2Info));
         std::string level2_path = path + "\\data\\level2.txt";
         ownLevel.load_level(level2_path, internal_levels, boxes, player);
@@ -105,10 +109,10 @@ void levelForm::initLevel(int mode) {
     }
 
     player.in_level->print_level_CIL();
-    print_level_GUI(*player.in_level);
+    print_level_GUI(*player.in_level, player);
 }
 
-void levelForm::print_level_GUI(const Level &curLevel) {
+void levelForm::print_level_GUI(const Level &curLevel, const Player &player1) {
     int level_height = curLevel.map.height;
     int level_width = curLevel.map.width;
 
@@ -136,23 +140,23 @@ void levelForm::print_level_GUI(const Level &curLevel) {
             std::string imgs_path = std::filesystem::current_path().string() + "\\data";
 
             bool isPlayer = false, isBox = false;
-            for (const auto &player: curLevel.players) {
+           for (const auto &player: curLevel.players) {
                 if (player->x == j + 1 && player->y == i + 1) {
-                    isPlayer = true;
-                    if (curLevel.map.map_units[player->x][player->y].type == 4) {
-                        std::string img_path = imgs_path + "\\playerAtCheckPoint.png";
-                        pic.load(QString::fromStdString(img_path));
-                    } else {
-                        std::string img_path = imgs_path + "\\player.png";
-                        pic.load(QString::fromStdString(img_path));
-                    }
+                isPlayer = true;
+                    if (curLevel.map.map_units[player->y][player->x].type == 4) {
+                    std::string img_path = imgs_path + "\\playerAtCheckPoint.png";
+                    pic.load(QString::fromStdString(img_path));
+                } else {
+                    std::string img_path = imgs_path + "\\player.png";
+                    pic.load(QString::fromStdString(img_path));
                 }
             }
+           }
 
             for (const auto &box: curLevel.boxes) {
                 if (box->x == j + 1 && box->y == i + 1) {
                     isBox = true;
-                    if (curLevel.map.map_units[box->x][box->y].type == 3) {
+                    if (curLevel.map.map_units[box->y][box->x].type == 3) {
                         std::string img_path = imgs_path + "\\boxAtCheckPoint.png";
                         pic.load(QString::fromStdString(img_path));
                     } else {
