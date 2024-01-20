@@ -60,23 +60,23 @@ void LogInDialog::on_loginButton_clicked()
     readUserAndPwd(user, password);
     std::string user_input = ui->usernameEdit->text().toStdString();
     std::string pwd_input = ui->passwordEdit->text().toStdString();
-    int user_pos=-1, pwd_pos=-1;
+    int user_pos=-1;
     for(int i=0;i<user.size();i++)
         if(user[i]==user_input){
             user_pos = i;
             break;
         }
-    for(int i=0;i<password.size();i++)
-        if(password[i]==pwd_input){
-            pwd_pos = i;
-            break;
-        }
-    if(user_pos != -1 && pwd_pos != -1 && user_pos == pwd_pos)
+    if(user_pos != -1)
     {
-        accept();
+        if(password[user_pos] == pwd_input)
+            accept();
+        else
+            QMessageBox::warning(this, tr("Waring"),
+                                 tr("password is wrong!"),
+                                 QMessageBox::Yes);
     } else {
         QMessageBox::warning(this, tr("Waring"),
-                             tr("user name or password error!"),
+                             tr("user name does not exist!"),
                              QMessageBox::Yes);
     }
 }
