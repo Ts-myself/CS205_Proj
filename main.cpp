@@ -83,8 +83,8 @@ int main() {
     int test_position_x[] = {8, 4};
     int test_position_y[] = {1, 4};
     Box* box1 =new Box(5, 3, " ",4,test_position_x,true,&level2, nullptr);
-    Box* box2 =new Box(6, 3, " ",4,test_position_y,true,&level3, nullptr);
-    Box* box3 =new Box(8, 3, " ");
+    Box* box2 =new Box(8, 3, " ",3,test_position_y,true,&level3, nullptr);
+    Box* box3 =new Box(6, 3, " ");
 
     //box push in levels
     level1.boxes.push_back(box1);
@@ -98,6 +98,18 @@ int main() {
     //greedy snake
     level1.father_box=box1;
     level1.father_level=&level1;
+
+    //multiple reference of box2
+    Box box4=*box2;
+    box4.x=7;
+    box4.y=5;
+    Box box5=*box2;
+    box5.x=7;
+    box5.y=6;
+    level1.boxes.push_back(&box4);
+    level1.boxes.push_back(&box5);
+    box2->inter_level->father_box=box1;
+    box2->inter_level->father_level=&level1;
 
     //player in level 1
     level1.players.push_back(&player1);
