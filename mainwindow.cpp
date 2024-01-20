@@ -38,6 +38,7 @@ void MainWindow::on_level3Botton_clicked()
     // this->hide();
 }
 
+
 void MainWindow::on_quitBotton_clicked()
 {
     std::cout<<"QUIT\n";
@@ -50,5 +51,14 @@ void MainWindow::on_editLevelBotton_clicked()
     std::cout<<"EDIT LEVEL\n";
     editForm.show();
     editForm.init();
+}
+
+
+
+void MainWindow::on_edittedLevelButton_clicked()
+{
+    std::cout<<"EDITTED LEVEL\n";
+    if(edittedLevel.initLevel(4))
+        edittedLevel.show();
 }
 

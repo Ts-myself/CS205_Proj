@@ -1,8 +1,9 @@
 #include "../include/level.hpp"
 
-#include <iostream>
-#include <string>
 #include <fstream>
+#include <string>
+#include <iostream>
+#include <QMessageBox>
 
 Level::Level() {};
 
@@ -152,13 +153,12 @@ struct Point2 {
     int y;
 };
 
-void
-Level::load_level(const std::string &level_path, std::vector<Level *> &internal_levels_, std::vector<Box *> &boxes_,
-                  Player &player_) {
+bool Level::load_level(const std::string &level_path, std::vector<Level *> &internal_levels_,
+                       std::vector<Box *> &boxes_, Player &player_) {
     std::ifstream level_file(level_path);
     if (!level_file.is_open()) {
         std::cout << "Error: the level file cannot be opened." << std::endl;
-        return;
+        return false;
     }
     std::string line;
     std::vector<std::string> level_info;
@@ -166,6 +166,13 @@ Level::load_level(const std::string &level_path, std::vector<Level *> &internal_
         level_info.push_back(line);
     }
     level_file.close();
+
+    if(level_info[0] != "Levels:"){
+        std::cout << "Error: the editted level file has a wrong format." << std::endl;
+        QMessageBox::warning(nullptr, "Waring",
+                             "The editted level file has a wrong format!");
+        return false;
+    }
 
     int origin_map_width, origin_map_height;
     std::string origin_map_info;
@@ -315,7 +322,7 @@ Level::load_level(const std::string &level_path, std::vector<Level *> &internal_
             boxes_[i]->inter_level = boxes_[boxes_fa[i]]->inter_level;
         }
     }
-
+    return true;
 
     // the format of the level file is as follows:
     /* Levels:

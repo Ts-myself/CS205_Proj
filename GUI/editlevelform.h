@@ -17,6 +17,11 @@ public:
 
     void init();
 
+private slots:
+    void on_quitBotton_4_clicked();
+
+    void on_resetBotton_4_clicked();
+
 private:
     Ui::editLevelForm *ui;
 };

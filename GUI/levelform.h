@@ -20,7 +20,7 @@ public:
     explicit levelForm(QWidget *parent = nullptr);
     ~levelForm();
 
-    void initLevel(int mode);
+    bool initLevel(int mode);
     void print_level_GUI(const Level &level, const Player &player);
     Level ownLevel;
     std::vector<Level*> internal_levels;

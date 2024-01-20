@@ -67,7 +67,7 @@ void levelForm::keyPressEvent(QKeyEvent *ev) {
 }
 
 //mode: 1-level1, 2-level1, 3-level3, 4-load editted level
-void levelForm::initLevel(int mode) {
+bool levelForm::initLevel(int mode) {
     levelMode = mode;
     // ui->levelInfoLabel->setText(QString::fromStdString("level " + std::to_string(levelMode)));
     Level initLevel;
@@ -84,7 +84,8 @@ void levelForm::initLevel(int mode) {
                                  "Go to the empty 5x5, which we denote it as LOSE";
         ui->levelInfoLabel->setText(QString::fromStdString(level1Info));
         std::string level1_path = path + "\\data\\level1.txt";
-        ownLevel.load_level(level1_path, internal_levels, boxes, player);
+        if (!ownLevel.load_level(level1_path, internal_levels, boxes, player))
+            return false;
     } else if (mode == 2) {
         std::string level2Info = "Level 2\n\n"
                                  "Show Recursive Box\n"
@@ -95,21 +96,37 @@ void levelForm::initLevel(int mode) {
                                  "(Use reset to implment the above stuations)";
         ui->levelInfoLabel->setText(QString::fromStdString(level2Info));
         std::string level2_path = path + "\\data\\level2.txt";
-        ownLevel.load_level(level2_path, internal_levels, boxes, player);
+        if (!ownLevel.load_level(level2_path, internal_levels, boxes, player))
+            return false;
     } else if (mode == 3) {
         std::string level3Info = "Level 3\n\n"
                                  "Show Recursive Box\n"
                                  "Go from A to B, where A is next to B\n";
         ui->levelInfoLabel->setText(QString::fromStdString(level3Info));
         std::string level3_path = path + "\\data\\level3.txt";
-        ownLevel.load_level(level3_path, internal_levels, boxes, player);
+        if (!ownLevel.load_level(level3_path, internal_levels, boxes, player))
+            return false;
     } else if (mode == 4) {
         std::string edit_level_path = path + "\\data\\editLevel.txt";
-        ownLevel.load_level(edit_level_path, internal_levels, boxes, player);
+        if (!ownLevel.load_level(edit_level_path, internal_levels, boxes, player))
+            return false;
     }
 
     player.in_level->print_level_CIL();
+    bool is_print[internal_levels.size() + 1];
+    for (int i = 0; i < internal_levels.size() + 1; i++) {
+        is_print[i] = false;
+    }
+    for (auto &box_print: player.in_level->boxes) {
+        if (box_print->is_has_internal_level) {
+            if (!is_print[box_print->inter_level->level_number - 1]) {
+                box_print->inter_level->print_level_CIL();
+                is_print[box_print->inter_level->level_number - 1] = true;
+            }
+        }
+    }
     print_level_GUI(*player.in_level, player);
+    return true;
 }
 
 void levelForm::print_level_GUI(const Level &curLevel, const Player &player1) {
@@ -140,18 +157,18 @@ void levelForm::print_level_GUI(const Level &curLevel, const Player &player1) {
             std::string imgs_path = std::filesystem::current_path().string() + "\\data";
 
             bool isPlayer = false, isBox = false;
-           for (const auto &player: curLevel.players) {
+            for (const auto &player: curLevel.players) {
                 if (player->x == j + 1 && player->y == i + 1) {
-                isPlayer = true;
+                    isPlayer = true;
                     if (curLevel.map.map_units[player->y][player->x].type == 4) {
-                    std::string img_path = imgs_path + "\\playerAtCheckPoint.png";
-                    pic.load(QString::fromStdString(img_path));
-                } else {
-                    std::string img_path = imgs_path + "\\player.png";
-                    pic.load(QString::fromStdString(img_path));
+                        std::string img_path = imgs_path + "\\playerAtCheckPoint.png";
+                        pic.load(QString::fromStdString(img_path));
+                    } else {
+                        std::string img_path = imgs_path + "\\player.png";
+                        pic.load(QString::fromStdString(img_path));
+                    }
                 }
             }
-           }
 
             for (const auto &box: curLevel.boxes) {
                 if (box->x == j + 1 && box->y == i + 1) {

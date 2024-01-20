@@ -2,11 +2,19 @@
 #include "ui_editlevelform.h"
 
 #include <filesystem>
+#include <QApplication>
+#include <QMainWindow>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QFile>
+#include <QTextStream>
+
 editLevelForm::editLevelForm(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::editLevelForm)
 {
     ui->setupUi(this);
+    ui->levelEdit->setFixedSize(200,600);
 }
 
 editLevelForm::~editLevelForm()
@@ -31,3 +39,38 @@ void editLevelForm::init(){
     ui->editExampleLabel->setPixmap(pic1);
 
 }
+
+void editLevelForm::on_quitBotton_4_clicked()
+{
+    this->close();
+}
+
+
+void editLevelForm::on_resetBotton_4_clicked()
+{
+    std::string file_path = std::filesystem::current_path().string() + "\\data\\editLevel.txt";
+    QFile file(QString::fromStdString(file_path));
+    if (file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
+    {
+        file.close();
+        qDebug() << "File cleared successfully.";
+    }
+    else
+    {
+        qDebug() << "Failed to clear file.";
+    }
+
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream stream(&file);
+        stream << ui->levelEdit->toPlainText();
+        file.close();
+        qDebug() << "File saved successfully.";
+    }
+    else
+    {
+        qDebug() << "Failed to save file.";
+    }
+    this->close();
+}
+

@@ -15,7 +15,7 @@ public:
 
     void print_level_CIL();
 
-    void load_level(const std::string &level_path, std::vector<Level*> &internal_levels_, std::vector<Box*> &boxes_,
+    bool load_level(const std::string &level_path, std::vector<Level*> &internal_levels_, std::vector<Box*> &boxes_,
                     Player &player_);
 
 //    int player_movable(size_t player_index, int dx, int dy);

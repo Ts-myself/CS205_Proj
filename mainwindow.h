@@ -24,7 +24,7 @@ public:
     levelForm level2;
     levelForm level3;
     editLevelForm editForm;
-    std::vector<levelForm> edittedLevel;
+    levelForm edittedLevel;
 
 private slots:
     void on_level1Botton_clicked();
@@ -34,6 +34,9 @@ private slots:
     void on_quitBotton_clicked();
 
     void on_editLevelBotton_clicked();
+
+
+    void on_edittedLevelButton_clicked();
 
 private:
     Ui::MainWindow *ui;

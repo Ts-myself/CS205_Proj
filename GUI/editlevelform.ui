@@ -15,21 +15,14 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
+    <widget class="QTextEdit" name="levelEdit"/>
+   </item>
+   <item>
     <layout class="QVBoxLayout" name="sideLayout_4">
      <item>
       <widget class="QLabel" name="levelInfoLabel_4">
        <property name="text">
         <string>Editted</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="editNumLabel">
-       <property name="text">
-        <string>Level 1</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -60,9 +53,6 @@
         </widget>
        </item>
       </layout>
-     </item>
-     <item>
-      <widget class="QTextEdit" name="textEdit"/>
      </item>
      <item>
       <widget class="QPushButton" name="resetBotton_4">
