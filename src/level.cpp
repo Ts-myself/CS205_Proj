@@ -178,6 +178,8 @@ Level::load_level(const std::string &level_path, std::vector<Level *> &internal_
     std::vector<int> boxes_enter;
     std::vector<Point2> boxes_enter_pos;
     std::vector<bool> boxes_res;
+    std::vector<int> boxes_fa;
+    std::vector<Point2> boxes_copy_pos;
 
     int players_num;
 
@@ -236,7 +238,18 @@ Level::load_level(const std::string &level_path, std::vector<Level *> &internal_
     offsetLine += 1;
     for (int i = 0; i < boxes_num; i++) {
         std::vector<int> box_info = line_to_int(level_info[offsetLine]);
-        boxes_res.push_back(box_info[3] == -2 ? true : false);
+
+        boxes_fa.push_back(box_info[3]);
+        boxes_copy_pos.push_back({box_info[1], box_info[2]});
+        // if (box_info[3] >= 0) {
+        //     Box box_copy = *boxes_[box_info[3]];
+        //     box_copy.x=box_info[1];
+        //     box_copy.y=box_info[2];
+        //     boxes_.push_back(&box_copy);
+        // } else{
+
+        // }
+        boxes_res.push_back(box_info[3] == -2);
         boxes_.push_back(new Box(box_info[1], box_info[2], " "));
         boxes_in_level.push_back(box_info[0]);
         if (box_info[0] == -1) {
@@ -244,12 +257,10 @@ Level::load_level(const std::string &level_path, std::vector<Level *> &internal_
         } else {
             internal_levels_[box_info[0]]->boxes.push_back(boxes_.back());
         }
-        if (box_info[3] >= 0) {
-            boxes_.back()->father_box = boxes_[box_info[3]];
-        }
-        boxes_.back()->enter_direction = boxes_enter[boxes_.size() - 1];
-        boxes_.back()->position_to_enter[0] = boxes_enter_pos[boxes_.size() - 1].x;
-        boxes_.back()->position_to_enter[1] = boxes_enter_pos[boxes_.size() - 1].y;
+        // boxes_.back()->enter_direction = boxes_enter[boxes_.size() - 1];
+        // boxes_.back()->position_to_enter[0] = boxes_enter_pos[boxes_.size() - 1].x;
+        // boxes_.back()->position_to_enter[1] = boxes_enter_pos[boxes_.size() - 1].y;
+
         offsetLine += 1;
     }
 
@@ -277,16 +288,30 @@ Level::load_level(const std::string &level_path, std::vector<Level *> &internal_
         internal_levels_[i]->father_box = boxes_[belong_box];
         boxes_[belong_box]->inter_level = internal_levels_[i];
         boxes_[belong_box]->is_has_internal_level = true;
+        boxes_[belong_box]->enter_direction = boxes_enter[i];
+        boxes_[belong_box]->position_to_enter[0] = boxes_enter_pos[i].x;
+        boxes_[belong_box]->position_to_enter[1] = boxes_enter_pos[i].y;
         if (boxes_res[belong_box]) {
-            boxes_[belong_box]->father_level = boxes_[belong_box]->inter_level;
-            boxes_[belong_box]->inter_level->boxes.push_back(boxes_[belong_box]);
-            boxes_[belong_box]->inter_level->father_box = boxes_[belong_box];
+//            boxes_[belong_box]->father_level = boxes_[belong_box]->inter_level;
+           boxes_[belong_box]->inter_level->boxes.push_back(boxes_[belong_box]);
             boxes_[belong_box]->inter_level->father_level = boxes_[belong_box]->inter_level;
+            boxes_[belong_box]->inter_level->father_box = boxes_[belong_box];
+        }else{
+            if (boxes_in_level[belong_box] == -1) {
+                internal_levels_[i]->father_level = this;
+            } else {
+                internal_levels_[i]->father_level = internal_levels_[boxes_in_level[belong_box]];
+            }
         }
-        if (boxes_in_level[belong_box] == -1) {
-            internal_levels_[i]->father_level = this;
-        } else {
-            internal_levels_[i]->father_level = internal_levels_[boxes_in_level[belong_box]];
+    }
+
+    // box copy and father
+    for(int i=0;i<boxes_fa.size();i++){
+        if(boxes_fa[i]>=0){
+            Box box_copy = *boxes_[boxes_fa[i]];
+            boxes_[i] = &box_copy;
+            boxes_[i]->x = boxes_copy_pos[i].x;
+            boxes_[i]->y = boxes_copy_pos[i].y;
         }
     }
 

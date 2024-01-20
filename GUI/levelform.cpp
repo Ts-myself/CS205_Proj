@@ -45,6 +45,7 @@ void levelForm::keyPressEvent(QKeyEvent *ev) {
                              tr("You lose!"),
                              QMessageBox::Yes);
         this->close();
+        return;
     }
     player.in_level->print_level_CIL();
     print_level_GUI(*player.in_level);
