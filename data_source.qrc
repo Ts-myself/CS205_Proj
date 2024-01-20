@@ -1,9 +1,0 @@
-<RCC>
-    <qresource prefix="/imgs">
-        <file>data/atwood.png</file>
-        <file>data/wall.png</file>
-    </qresource>
-    <qresource prefix="/user">
-        <file>data/user_pwd.txt</file>
-    </qresource>
-</RCC>

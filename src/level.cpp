@@ -177,6 +177,7 @@ Level::load_level(const std::string &level_path, std::vector<Level *> &internal_
     std::vector<int> boxes_in_level;
     std::vector<int> boxes_enter;
     std::vector<Point2> boxes_enter_pos;
+    std::vector<bool> boxes_res;
 
     int players_num;
 
@@ -194,6 +195,7 @@ Level::load_level(const std::string &level_path, std::vector<Level *> &internal_
     Map origin_map(origin_map_width, origin_map_height);
     origin_map.draw_map(origin_map_info);
     map = origin_map;
+    level_number = 1;
     offsetLine += origin_map_height;
 
     // internal levels
@@ -224,6 +226,7 @@ Level::load_level(const std::string &level_path, std::vector<Level *> &internal_
         std::vector<Player *> vec_players;
         std::vector<Box *> vec_boxes;
         internal_levels_.push_back(new Level(i, internal_map, vec_players, vec_boxes));
+        internal_levels_.back()->level_number = i + 2;
         offsetLine += internal_map_height;
     }
 
@@ -233,6 +236,7 @@ Level::load_level(const std::string &level_path, std::vector<Level *> &internal_
     offsetLine += 1;
     for (int i = 0; i < boxes_num; i++) {
         std::vector<int> box_info = line_to_int(level_info[offsetLine]);
+        boxes_res.push_back(box_info[3] == -2 ? true : false);
         boxes_.push_back(new Box(box_info[1], box_info[2], " "));
         boxes_in_level.push_back(box_info[0]);
         if (box_info[0] == -1) {
@@ -240,7 +244,7 @@ Level::load_level(const std::string &level_path, std::vector<Level *> &internal_
         } else {
             internal_levels_[box_info[0]]->boxes.push_back(boxes_.back());
         }
-        if (box_info[3] != -1) {
+        if (box_info[3] >= 0) {
             boxes_.back()->father_box = boxes_[box_info[3]];
         }
         boxes_.back()->enter_direction = boxes_enter[boxes_.size() - 1];
@@ -273,6 +277,12 @@ Level::load_level(const std::string &level_path, std::vector<Level *> &internal_
         internal_levels_[i]->father_box = boxes_[belong_box];
         boxes_[belong_box]->inter_level = internal_levels_[i];
         boxes_[belong_box]->is_has_internal_level = true;
+        if (boxes_res[belong_box]) {
+            boxes_[belong_box]->father_level = boxes_[belong_box]->inter_level;
+            boxes_[belong_box]->inter_level->boxes.push_back(boxes_[belong_box]);
+            boxes_[belong_box]->inter_level->father_box = boxes_[belong_box];
+            boxes_[belong_box]->inter_level->father_level = boxes_[belong_box]->inter_level;
+        }
         if (boxes_in_level[belong_box] == -1) {
             internal_levels_[i]->father_level = this;
         } else {
@@ -540,8 +550,8 @@ void Level::rew_state_All() {
 }
 
 Box *Level::get_box(int x, int y) {
-    for (int i = boxes.size()-1; i >=0 ; --i) {
-        if (boxes[i]->x==x&&boxes[i]->y==y){
+    for (int i = boxes.size() - 1; i >= 0; --i) {
+        if (boxes[i]->x == x && boxes[i]->y == y) {
             return boxes[i];
         }
     }
@@ -549,12 +559,12 @@ Box *Level::get_box(int x, int y) {
 }
 
 bool Level::is_win() {
-    for (int i = 1;i<= map.height;i++){
-        for (int j = 1;j<= map.width;j++){
-            if (map.map_units[i][j].type == 3 && !is_box(j, i)){
+    for (int i = 1; i <= map.height; i++) {
+        for (int j = 1; j <= map.width; j++) {
+            if (map.map_units[i][j].type == 3 && !is_box(j, i)) {
                 return false;
             }
-            if (map.map_units[i][j].type == 4 && !is_player(j, i)){
+            if (map.map_units[i][j].type == 4 && !is_player(j, i)) {
                 return false;
             }
         }
@@ -570,6 +580,7 @@ bool Level::is_box(int x, int y) {
     }
     return false;
 }
+
 bool Level::is_player(int x, int y) {
     for (auto &player: players) {
         if (player->x == x && player->y == y) {

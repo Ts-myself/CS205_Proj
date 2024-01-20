@@ -11,10 +11,10 @@ namespace move {
             std::cout << " inf box! Overflow!" << std::endl;
 
             if (box != nullptr) {
-                std::cout << "box x: " << box->x << " box y: " << box->y << "enter empty space" << std::endl;
+                std::cout << "box x: " << box->x << " box y: " << box->y << "1enter empty space" << std::endl;
                 level->boxes.erase(level->boxes.begin() + get_box_index(box->x, box->y, level->boxes));
             } else {
-                std::cout << "player1 x: " << player->x << " y: " << player->y << " enter empty space" << std::endl;
+                std::cout << "player1 x: " << player->x << " y: " << player->y << " 1enter empty space" << std::endl;
                 level->players.erase(level->players.begin());
                 player->in_level = nullptr;
             }
@@ -32,9 +32,9 @@ namespace move {
         int height = level->map.height;
         if (level->level_number == 0) {
             if (box != nullptr) {
-                std::cout << "box x: " << box->x << " box y: " << box->y << "enter empty space" << std::endl;
+                std::cout << "box x: " << box->x << " box y: " << box->y << "2enter empty space" << std::endl;
             } else {
-                std::cout << "player x: " << player->x << " player y: " << player->y << "enter empty space"
+                std::cout << "player x: " << player->x << " player y: " << player->y << "2enter empty space"
                           << std::endl;
             }
             return false;
@@ -50,10 +50,10 @@ namespace move {
         if (next_x <= 0 || next_x > width || next_y <= 0 || next_y > height) {
             if (level->father_box == nullptr) {
                 if (box != nullptr) {
-                    std::cout << "box x: " << box->x << " box y: " << box->y << " enter empty space" << std::endl;
+                    std::cout << "box x: " << box->x << " box y: " << box->y << " 3enter empty space" << std::endl;
                     level->boxes.erase(level->boxes.begin() + get_box_index(box->x, box->y, level->boxes));
                 } else {
-                    std::cout << "player1 x: " << player->x << " y: " << player->y << "enter empty space" << std::endl;
+                    std::cout << "player1 x: " << player->x << " y: " << player->y << "3enter empty space" << std::endl;
                     level->players.erase(level->players.begin());
                     player->in_level = nullptr;
                 }

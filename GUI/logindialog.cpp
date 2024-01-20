@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <QMessagebox>
+#include <filesystem>
 
 LogInDialog::LogInDialog(QWidget *parent)
     : QDialog(parent)
@@ -25,7 +26,7 @@ void readUserAndPwd(std::vector<std::string> &user,std::vector<std::string> &pwd
     // std::string path_str = path.string();
     // std::string file_path = path_str + "\\data\\user_pwd.txt";
     // todo: change the path (qmake will change the source)
-    std::string file_path = "D:\\Data\\university\\Study\\Sophomore_Fisrt\\C++\\Proj\\CS205_Proj\\data\\user_pwd.txt";
+    std::string file_path = std::filesystem::current_path().string() + "\\data\\user_pwd.txt";
     // std::string file_path = ":\\..\\data\\user_pwd.txt";
 
     std::ifstream file(file_path);

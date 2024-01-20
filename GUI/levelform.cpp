@@ -3,6 +3,9 @@
 #include "../include/move.hpp"
 
 #include <QLabel>
+#include <QMessageBox>
+#include <iostream>
+#include <filesystem>
 
 levelForm::levelForm(QWidget * parent)
 :
@@ -36,8 +39,30 @@ void levelForm::keyPressEvent(QKeyEvent *ev) {
     } else if (ev->key() == Qt::Key_D) {
         move::recurse_move(1, 0, player.x, player.y, nullptr, &player, player.in_level, 0);
     }
+    if (player.in_level==nullptr) {
+        std::cout << "You lose!" << std::endl;
+        QMessageBox::information(this, tr("Lose"),
+                             tr("You lose!"),
+                             QMessageBox::Yes);
+        this->close();
+    }
     player.in_level->print_level_CIL();
     print_level_GUI(*player.in_level);
+    int count = 0;
+    for (auto level: internal_levels) {
+        if (!level->is_win()) {
+            break;
+        } else count++;
+    }
+    if(ownLevel.is_win())
+        count++;
+    if (count == internal_levels.size() + 1) {
+        std::cout << "You win!" << std::endl;
+        QMessageBox::information(this, tr("Win"),
+                             tr("You win!"),
+                             QMessageBox::Yes);
+        this->close();
+    }
 }
 
 //mode: 1-level1, 2-level1, 3-level3, 4-load editted level
@@ -48,17 +73,33 @@ void levelForm::initLevel(int mode) {
     ownLevel = initLevel;
     internal_levels.clear();
     boxes.clear();
+    std::string path = std::filesystem::current_path().string();
     if (mode == 1) {
-        std::string level1_path = "D:\\Data\\university\\Study\\Sophomore_Fisrt\\C++\\Proj\\CS205_Proj\\data\\level1.txt";
+        std::string level1Info = "Level 1\n\n"
+                                 "Show basic Sokuban Rules\n"
+                                 "Pushing more then 1 boxes\n"
+                                 "Player's check point\n\n"
+                                 "Internal structure of box(visible in CLI instead of GUI).\n"
+                                 "Go to the empty 5x5, which we denote it as LOSE";
+        ui->levelInfoLabel->setText(QString::fromStdString(level1Info));
+        std::string level1_path = path + "\\data\\level1.txt";
         ownLevel.load_level(level1_path, internal_levels, boxes, player);
     } else if (mode == 2) {
-        std::string level2_path = " ";
+        std::string level2Info = "Level 2\n\n"
+                                 "Show Recursive Box\n"
+                                 "GO out of A, then out of B\n";
+        ui->levelInfoLabel->setText(QString::fromStdString(level2Info));
+        std::string level2_path = path + "\\data\\level2.txt";
         ownLevel.load_level(level2_path, internal_levels, boxes, player);
     } else if (mode == 3) {
-        std::string level3_path = " ";
+        std::string level3Info = "Level 3\n\n"
+                                 "Show Recursive Box\n"
+                                 "Go from A to B, where A is next to B\n";
+        ui->levelInfoLabel->setText(QString::fromStdString(level3Info));
+        std::string level3_path = path + "\\data\\level3.txt";
         ownLevel.load_level(level3_path, internal_levels, boxes, player);
     } else if (mode == 4) {
-        std::string edit_level_path = " ";
+        std::string edit_level_path = path + "\\data\\editLevel.txt";
         ownLevel.load_level(edit_level_path, internal_levels, boxes, player);
     }
 
@@ -76,6 +117,7 @@ void levelForm::print_level_GUI(const Level &curLevel) {
         for (int j = 0; j < 10; j++) {
             QWidget * widgetItem = ui->levelLayout->itemAtPosition(i, j)->widget();
             QLabel * labelItem = qobject_cast<QLabel *>(widgetItem);
+            labelItem->clear();
             labelItem->setText("");
         }
     }
@@ -83,13 +125,14 @@ void levelForm::print_level_GUI(const Level &curLevel) {
         for (int j = 0; j < 10; j++) {
             QWidget * widgetItem = ui->levelLayout->itemAtPosition(j, i)->widget();
             QLabel * labelItem = qobject_cast<QLabel *>(widgetItem);
+            labelItem->clear();
             labelItem->setText("");
         }
     }
     for (int i = 0; i < level_height; i++) {
         for (int j = 0; j < level_width; j++) {
             QPixmap pic;
-            std::string imgs_path = "D:\\Data\\university\\Study\\Sophomore_Fisrt\\C++\\Proj\\CS205_Proj\\data";
+            std::string imgs_path = std::filesystem::current_path().string() + "\\data";
 
             bool isPlayer = false, isBox = false;
             for (const auto &player: curLevel.players) {
