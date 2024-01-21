@@ -39,11 +39,11 @@ namespace move {
             return false;
         }
         if (box == nullptr && player == nullptr) {
-            std::cout << "error: box and player are both nullptr" << std::endl;
+            //std::cout << "error: box and player are both nullptr" << std::endl;
             return false;
         }
         if (box != nullptr && player != nullptr) {
-            std::cout << "error: box and player are both not nullptr" << std::endl;
+            //std::cout << "error: box and player are both not nullptr" << std::endl;
             return false;
         }
         //out of map
@@ -63,39 +63,69 @@ namespace move {
             int enter_y = level->father_box->y;
             Player *temp_player = nullptr;
             Box *temp_box = nullptr;
-            if (is_player(next_x-dx, next_y-dy, level->players)) {
-                temp_player = level->players[0];
-                level->players.erase(level->players.begin());
-                level->father_level->players.push_back(temp_player);
-                player->in_level = level->father_level;
-                player->x = enter_x;
-                player->y = enter_y;
-            } else{
-                temp_box = level->get_box(next_x-dx, next_y-dy);
-                level->boxes.erase(level->boxes.begin() + get_box_index(next_x-dx, next_y-dy, level->boxes));
-                temp_box->x = enter_x;
-                temp_box->y = enter_y;
-                level->father_level->boxes.push_back(temp_box);
-                std::vector<Unit *> units;
-                int temp_x_1 = x;
-                int temp_y_1 = y;
-                if (next_x-dx==0||next_x-dx>=width+1||next_y-dy==0||next_y-dy>=height+1){
+            if (player== nullptr){
+                if (is_box(next_x-dx,next_y-dy,level->boxes)){
+                    temp_box = level->get_box(next_x-dx,next_y-dy);
+                    level->boxes.erase(level->boxes.begin() + get_box_index(next_x-dx, next_y-dy, level->boxes));
+                    temp_box->x = enter_x;
+                    temp_box->y = enter_y;
+                    level->father_level->boxes.push_back(temp_box);
+                    std::vector<Unit *> units;
+                    int temp_x_1 = x;
+                    int temp_y_1 = y;
+                    if (next_x-dx==0||next_x-dx>=width+1||next_y-dy==0||next_y-dy>=height+1){
 
-                } else{
-                    while (is_box(temp_x_1, temp_y_1, level->boxes) || is_player(temp_x_1, temp_y_1, level->players)) {
-                        if (is_player(temp_x_1, temp_y_1, level->players)) {
-                            units.push_back(level->players[0]);
-                        } else {
-                            units.push_back(level->get_box(temp_x_1, temp_y_1));
+                    } else{
+                        while (is_box(temp_x_1, temp_y_1, level->boxes) || is_player(temp_x_1, temp_y_1, level->players)) {
+                            if (is_player(temp_x_1, temp_y_1, level->players)) {
+                                units.push_back(level->players[0]);
+                            } else {
+                                units.push_back(level->get_box(temp_x_1, temp_y_1));
+                            }
+                            temp_x_1 += dx;
+                            temp_y_1 += dy;
                         }
-                        temp_x_1 += dx;
-                        temp_y_1 += dy;
+                        for (auto &unit: units) {
+                            unit->move(dx, dy);
+                        }
                     }
-                    for (auto &unit: units) {
-                        unit->move(dx, dy);
+                }
+            } else{
+                if (is_player(next_x-dx, next_y-dy, level->players)) {
+                    temp_player = level->players[0];
+                    level->players.erase(level->players.begin());
+                    level->father_level->players.push_back(temp_player);
+                    player->in_level = level->father_level;
+                    player->x = enter_x;
+                    player->y = enter_y;
+                } else{
+                    temp_box = level->get_box(next_x-dx, next_y-dy);
+                    level->boxes.erase(level->boxes.begin() + get_box_index(next_x-dx, next_y-dy, level->boxes));
+                    temp_box->x = enter_x;
+                    temp_box->y = enter_y;
+                    level->father_level->boxes.push_back(temp_box);
+                    std::vector<Unit *> units;
+                    int temp_x_1 = x;
+                    int temp_y_1 = y;
+                    if (next_x-dx==0||next_x-dx>=width+1||next_y-dy==0||next_y-dy>=height+1){
+
+                    } else{
+                        while (is_box(temp_x_1, temp_y_1, level->boxes) || is_player(temp_x_1, temp_y_1, level->players)) {
+                            if (is_player(temp_x_1, temp_y_1, level->players)) {
+                                units.push_back(level->players[0]);
+                            } else {
+                                units.push_back(level->get_box(temp_x_1, temp_y_1));
+                            }
+                            temp_x_1 += dx;
+                            temp_y_1 += dy;
+                        }
+                        for (auto &unit: units) {
+                            unit->move(dx, dy);
+                        }
                     }
                 }
             }
+
            return recurse_move(dx, dy, enter_x, enter_y, temp_box, temp_player, level->father_level, count + 1);
 
         }
