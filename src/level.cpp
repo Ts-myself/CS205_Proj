@@ -57,7 +57,7 @@ void Level::print_level_CIL() {
                 std::cout << "| p: Player on checkpoint |";
                 break;
             case 3:
-                std::cout << "| O: Box with no internal |";
+                std::cout << "| O: Box                  |";
                 break;
             case 4:
                 std::cout << "| =: Checkpoint           |";
@@ -104,10 +104,10 @@ void Level::print_level_CIL() {
                     std::cout << "| O: Box with no internal |";
                     break;
                 case 4:
-                    std::cout << "| =: Checkpoint           |";
+                    std::cout << "| =: Box's checkpoint     |";
                     break;
                 case 5:
-                    std::cout << "| -: Storage Point        |";
+                    std::cout << "| @: Player's checkpoint  |";
                     break;
                 case 6:
                     std::cout << "| #: Wall                 |";

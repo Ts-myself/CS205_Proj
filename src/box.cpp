@@ -69,3 +69,7 @@ Box::Box(int x, int y, std::string img_path, int enter_direction, int *position_
     this->inter_level_ptr = inter_level;
     this->father_box_ptr = father_box;
 }
+
+void Box::set_num(int num) {
+    box_num = num;
+}

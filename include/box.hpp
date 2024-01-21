@@ -11,6 +11,10 @@ class Level;
 class Box : public Unit {
 public:
     Box();
+    int box_num = 0;
+    void set_num(int num);
+    bool is_copy = false;
+    Box *copy_box = nullptr;
 
     Box(int x, int y, std::string img_path);
 
