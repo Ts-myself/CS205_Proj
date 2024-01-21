@@ -55,7 +55,7 @@ void Level::print_level_CIL() {
                 std::cout << "| p: Player on checkpoint |";
                 break;
             case 3:
-                std::cout << "| O: Box with no internal |";
+                std::cout << "| O: Box                  |";
                 break;
             case 4:
                 std::cout << "| =: Checkpoint           |";
@@ -102,10 +102,10 @@ void Level::print_level_CIL() {
                     std::cout << "| O: Box with no internal |";
                     break;
                 case 4:
-                    std::cout << "| =: Checkpoint           |";
+                    std::cout << "| =: Box's checkpoint     |";
                     break;
                 case 5:
-                    std::cout << "| -: Storage Point        |";
+                    std::cout << "| @: Player's checkpoint  |";
                     break;
                 case 6:
                     std::cout << "| #: Wall                 |";
@@ -379,14 +379,5 @@ bool Level::is_player(int x, int y) {
         }
     }
     return false;
-}
-
-Level::Level(int level_number, Map &map, std::vector<std::shared_ptr<Player>> &players,
-             std::vector<std::shared_ptr<Box>> &boxes) {
-    this->level_number = level_number;
-    this->map = map;
-    this->players_ptr = players;
-    this->boxes_ptr = boxes;
-
 }
 

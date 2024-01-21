@@ -19,6 +19,7 @@ bool operation_player_move(Player &player);
 Map default_map(8, 8);
 Map test_internalBox_map(8, 8);
 Map test_internalBox_map2(8, 8);
+Map test_internalBox_map3(8, 8);
 Map empty_map(5, 5);
 int main() {
     //player
@@ -35,7 +36,7 @@ int main() {
     Level empty_level(0,empty_map,empty_players,empty_boxes);
     //level 1
     std::string default_map_str = "########\n"
-                                  "  #  -- \n"
+                                  "#    --#\n"
                                   "##----- \n"
                                   " ####--#\n"
                                   "##--#--#\n"
@@ -47,12 +48,12 @@ int main() {
     std::vector<Box*> default_boxes;
     Level level1(1, default_map, default_players, default_boxes);
     //level 2
-    std::string test_internalBox_map_str = "########\n"
+    std::string test_internalBox_map_str = "####### \n"
                                            "#-   --#\n"
-                                           "##-----#\n"
-                                           "#---@- -\n"
-                                           "##--#--#\n"
-                                           "#------#\n"
+                                           "##----- \n"
+                                           " --- - -\n"
+                                           " #--#-- \n"
+                                           " ------#\n"
                                            "#----###\n"
                                            "########\n";
     test_internalBox_map.draw_map(test_internalBox_map_str);
@@ -72,28 +73,56 @@ int main() {
     std::vector<Box*> test_internalBox_boxes2;
     std::vector<Player*> test_internalBox_players2;
     Level level3(3, test_internalBox_map2, test_internalBox_players2, test_internalBox_boxes2);
+    //level 4
+    std::string test_internalBox_map_str3 ="########\n"
+                                           "#-   --#\n"
+                                           "##-----#\n"
+                                           " ------ \n"
+                                           "##--#--#\n"
+                                           "#------#\n"
+                                           "#----###\n"
+                                           "########\n";
+    test_internalBox_map3.draw_map(test_internalBox_map_str3);
+    std::vector<Box*> test_internalBox_boxes3;
+    std::vector<Player*> test_internalBox_players3;
+    Level level4(4, test_internalBox_map3, test_internalBox_players3, test_internalBox_boxes3);
+
     //store all levels
     std::vector<Level*> levels;
     //store all levels
     levels.push_back(&level1);
     levels.push_back(&level2);
     levels.push_back(&level3);
+    levels.push_back(&level4);
 
     //boxes
     int test_position_x[] = {8, 4};
     int test_position_y[] = {1, 4};
-    Box* box1 =new Box(5, 3, " ",4,test_position_x,true,&level2, nullptr);
+    Box* box1 =new Box(7, 2, " ",3,test_position_y,true,&level2, nullptr);
     Box* box2 =new Box(8, 3, " ",3,test_position_y,true,&level3, nullptr);
-    Box* box3 =new Box(6, 3, " ");
+    Box* box3 =new Box(6, 2, " ");
+    Box* box6 =new Box(5, 7, " ",3,test_position_y,true,&level4, nullptr);
+    box1->set_num(1);
+    box2->set_num(2);
+    box3->set_num(3);
 
     //box push in levels
     level1.boxes.push_back(box1);
     level1.boxes.push_back(box2);
     level1.boxes.push_back(box3);
+    level1.boxes.push_back(box6);
+
 
     //box1 as recurse box
     box1->inter_level->father_level=&level2;
-    box1->inter_level->father_box=box1;
+    Box temp_box=Box();
+    temp_box.set_num(1);
+    temp_box.is_has_internal_level=true;
+    temp_box.inter_level=&level2;
+    temp_box.x=8;
+    temp_box.y=4;
+    box1->inter_level->boxes.push_back(&temp_box);
+    box1->inter_level->father_box=&temp_box;
 
     //greedy snake
     level1.father_box=box1;
@@ -101,13 +130,23 @@ int main() {
 
     //multiple reference of box2
     Box box4=*box2;
+    box4.is_copy=true;
+    box4.copy_box=box2;
     box4.x=7;
     box4.y=5;
     Box box5=*box2;
-    box5.x=7;
-    box5.y=6;
+    box5.copy_box=box2;
+    box5.is_copy=true;
+    box5.x=4;
+    box5.y=5;
+    box4.set_num(4);
+    box5.set_num(5);
+    //add the two box to level1
     level1.boxes.push_back(&box4);
-    level1.boxes.push_back(&box5);
+    level4.boxes.push_back(&box5);
+    box6->inter_level->father_box=box6;
+    box6->inter_level->father_level=&level1;
+    //define box2's internal level
     box2->inter_level->father_box=box1;
     box2->inter_level->father_level=&level1;
 
@@ -119,6 +158,11 @@ int main() {
             << std::endl;
     std::cout << "Level 1:" << std::endl;
     while (true) {
+        if (player1.in_level->level_number==0){
+            std::cout << "enter empty space" << std::endl;
+            std::cout << "You lose!" << std::endl;
+            break;
+        }
         player1.in_level->print_level_CIL();
         bool is_print[levels.size()];
         for (int i = 0; i < levels.size(); i++) {
@@ -126,11 +170,17 @@ int main() {
         }
         //print all box's internal level
         for (auto & boxe : player1.in_level->boxes) {
+            std::cout << "box " << boxe->box_num;
+            std::cout << " position: " << boxe->x << "," << boxe->y << std::endl;
+            if(boxe->is_copy){
+                std::cout << "this box is a copy of box" <<boxe->copy_box->box_num <<std::endl;
+            }
             if (boxe->is_has_internal_level){
-                if (!is_print[boxe->inter_level->level_number-1]){
-                    boxe->inter_level->print_level_CIL();
-                    is_print[boxe->inter_level->level_number-1]=true;
-                }
+                boxe->inter_level->print_level_CIL();
+                is_print[boxe->inter_level->level_number-1]=true;
+
+            } else {
+                std::cout << "this box has no internal level" << std::endl;
             }
         }
         int count = 0;
@@ -148,11 +198,11 @@ int main() {
         int c = player1.in_level->level_number;
         if (!operation_player_move(player1))
             break;
-        //check if player enter the recurse box
+        //check if player enter the same level
         if (a != player1.x || b != player1.y) {
             if (a-player1.x>1||a-player1.x<-1||b-player1.y>1||b-player1.y<-1){
                 if (c==player1.in_level->level_number){
-                    std::cout << "You enter the recurse box!" << std::endl;
+                    std::cout << "You enter the same level but has a big move!" << std::endl;
                     std::cout << "Level " << player1.in_level->level_number << ":" << std::endl;
                 }
             }
@@ -183,6 +233,13 @@ bool operation_player_move(Player &player) {
         move::recurse_move(1,0,player.x,player.y, nullptr,&player,player.in_level,0);
     }
     if (player.in_level==nullptr) {
+        std::cout << "player enter empty space" << std::endl;
+        std::cout << "You lose!" << std::endl;
+        return false;
+    }
+    if (player.x == 0 || player.x >= player.in_level->map.width + 1 || player.y == 0 ||
+        player.y >= player.in_level->map.height + 1) {
+        std::cout << "player enter empty space" << std::endl;
         std::cout << "You lose!" << std::endl;
         return false;
     }

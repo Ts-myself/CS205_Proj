@@ -12,7 +12,6 @@ public:
     Level();
 
     Level(int level_number, Map &map, std::vector<Player*> &players, std::vector<Box*> &boxes);
-    Level(int level_number, Map &map, std::vector<std::shared_ptr<Player>> &players, std::vector<std::shared_ptr<Box>> &boxes);
 
     void print_level_CIL();
 
@@ -22,9 +21,7 @@ public:
     int level_number = 1;
     Map map;
     std::vector<Player*> players;
-    std::vector<std::shared_ptr<Player>> players_ptr;
     std::vector<Box*> boxes;
-    std::vector<std::shared_ptr<Box>> boxes_ptr;
     void rew_state_Box();
     void rew_state_Player();
     void rew_state_All();
@@ -35,8 +32,6 @@ public:
 
     //level in this box
     Box * father_box = nullptr;
-    std::shared_ptr<Box> father_box_ptr = nullptr;
     //outer level
     Level * father_level = nullptr;
-    std::shared_ptr<Level> father_level_ptr = nullptr;
 };
