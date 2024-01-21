@@ -7,6 +7,7 @@
 #include <string>
 #include <QMessagebox>
 #include <filesystem>
+#include <iostream>
 
 LogInDialog::LogInDialog(QWidget *parent)
     : QDialog(parent)
@@ -31,6 +32,7 @@ void readUserAndPwd(std::vector<std::string> &user,std::vector<std::string> &pwd
     // std::string file_path = path_str + "\\data\\user_pwd.txt";
     std::string file_path = std::filesystem::current_path().string() + "\\data\\user_pwd.txt";
     // std::string file_path = ":\\..\\data\\user_pwd.txt";
+    std::cout<<"user path:\n"<<file_path<<'\n';
 
     std::ifstream file(file_path);
 
