@@ -24,6 +24,7 @@ Map test_internalBox_map4(4, 3);
 Map empty_map(5, 5);
 int main() {
     //player
+
     Player player1(5, 3, " ");
     //level 0 empty level
     std::string default_empty="     \n"
