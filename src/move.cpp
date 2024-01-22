@@ -212,6 +212,7 @@ namespace move {
             }
             return true;
         }
+        return true;
     }
 
     bool is_box(int x, int y, std::vector<Box*> &boxes) {

@@ -20,10 +20,11 @@ Map default_map(8, 8);
 Map test_internalBox_map(8, 8);
 Map test_internalBox_map2(8, 8);
 Map test_internalBox_map3(8, 8);
+Map test_internalBox_map4(4, 3);
 Map empty_map(5, 5);
 int main() {
     //player
-    Player player1(7, 3, " ");
+    Player player1(5, 3, " ");
     //level 0 empty level
     std::string default_empty="     \n"
                               "     \n"
@@ -36,9 +37,9 @@ int main() {
     Level empty_level(0,empty_map,empty_players,empty_boxes);
     //level 1
     std::string default_map_str = "########\n"
-                                  "#    --#\n"
+                                  "#------#\n"
                                   "##----- \n"
-                                  " ####--#\n"
+                                  "     --#\n"
                                   "##--#--#\n"
                                   "#------#\n"
                                   "#----###\n"
@@ -49,9 +50,9 @@ int main() {
     Level level1(1, default_map, default_players, default_boxes);
     //level 2
     std::string test_internalBox_map_str = "####### \n"
-                                           "#-   --#\n"
+                                           "#------#\n"
                                            "##----- \n"
-                                           " --- - -\n"
+                                           " -------\n"
                                            " #--#-- \n"
                                            " ------#\n"
                                            "#----###\n"
@@ -62,7 +63,7 @@ int main() {
     Level level2(2, test_internalBox_map, test_internalBox_players, test_internalBox_boxes);
     //level 3
     std::string test_internalBox_map_str2 ="########\n"
-                                           "#-   --#\n"
+                                           "#------#\n"
                                            "##-----#\n"
                                            " ---@-- \n"
                                            "##--#--#\n"
@@ -75,7 +76,7 @@ int main() {
     Level level3(3, test_internalBox_map2, test_internalBox_players2, test_internalBox_boxes2);
     //level 4
     std::string test_internalBox_map_str3 ="########\n"
-                                           "#-   --#\n"
+                                           "#------#\n"
                                            "##-----#\n"
                                            " ------ \n"
                                            "##--#--#\n"
@@ -86,6 +87,14 @@ int main() {
     std::vector<Box*> test_internalBox_boxes3;
     std::vector<Player*> test_internalBox_players3;
     Level level4(4, test_internalBox_map3, test_internalBox_players3, test_internalBox_boxes3);
+    //level 5
+    std::string test_internalBox_map_str4 ="####\n"
+                                           "----\n"
+                                           "####\n";
+    test_internalBox_map4.draw_map(test_internalBox_map_str4);
+    std::vector<Box*> test_internalBox_boxes4;
+    std::vector<Player*> test_internalBox_players4;
+    Level level5(5, test_internalBox_map4, test_internalBox_players4, test_internalBox_boxes4);
 
     //store all levels
     std::vector<Level*> levels;
@@ -94,23 +103,29 @@ int main() {
     levels.push_back(&level2);
     levels.push_back(&level3);
     levels.push_back(&level4);
+    levels.push_back(&level5);
 
     //boxes
     int test_position_x[] = {8, 4};
     int test_position_y[] = {1, 4};
-    Box* box1 =new Box(7, 2, " ",3,test_position_y,true,&level2, nullptr);
-    Box* box2 =new Box(8, 3, " ",3,test_position_y,true,&level3, nullptr);
-    Box* box3 =new Box(6, 2, " ");
+    int test_position_z[] = {5, 2};
+    Box* box1 =new Box(6, 2, " ",3,test_position_y,true,&level2, nullptr);
+    Box* box2 =new Box(4, 3, " ",4,test_position_x,true,&level3, nullptr);
+    Box* box3 =new Box(4, 2, " ");
     Box* box6 =new Box(5, 7, " ",3,test_position_y,true,&level4, nullptr);
+    Box* box7 =new Box(2, 7, " ",4,test_position_z,true,&level5, nullptr);
     box1->set_num(1);
     box2->set_num(2);
     box3->set_num(3);
+    box6->set_num(6);
+    box7->set_num(7);
 
     //box push in levels
     level1.boxes.push_back(box1);
     level1.boxes.push_back(box2);
     level1.boxes.push_back(box3);
     level1.boxes.push_back(box6);
+    level1.boxes.push_back(box7);
 
 
     //box1 as recurse box
@@ -125,19 +140,30 @@ int main() {
     box1->inter_level->father_box=&temp_box;
 
     //greedy snake
-    level1.father_box=box1;
-    level1.father_level=&level1;
+    Box temp_box2[4];
+    for (int i = 0; i < 4; ++i) {
+        temp_box2[i]=Box();
+        temp_box2[i].set_num(8+i);
+        temp_box2[i].x=i+1;
+        temp_box2[i].y=2;
+        level5.boxes.push_back(&temp_box2[i]);
+    }
+    Box temp_box3=Box();
+    temp_box3.x=5;
+    temp_box3.y=2;
+    box7->inter_level->father_level=&level5;
+    box7->inter_level->father_box=&temp_box3;
 
     //multiple reference of box2
     Box box4=*box2;
     box4.is_copy=true;
     box4.copy_box=box2;
-    box4.x=7;
+    box4.x=6;
     box4.y=5;
     Box box5=*box2;
     box5.copy_box=box2;
     box5.is_copy=true;
-    box5.x=4;
+    box5.x=6;
     box5.y=5;
     box4.set_num(4);
     box5.set_num(5);
@@ -146,8 +172,7 @@ int main() {
     level4.boxes.push_back(&box5);
     box6->inter_level->father_box=box6;
     box6->inter_level->father_level=&level1;
-    //define box2's internal level
-    box2->inter_level->father_box=box1;
+    box2->inter_level->father_box=box2;
     box2->inter_level->father_level=&level1;
 
     //player in level 1
@@ -170,6 +195,9 @@ int main() {
         }
         //print all box's internal level
         for (auto & boxe : player1.in_level->boxes) {
+            if (boxe->x==0||boxe->x>=player1.in_level->map.width+1||boxe->y==0||boxe->y>=player1.in_level->map.height+1){
+                continue;
+            }
             std::cout << "box " << boxe->box_num;
             std::cout << " position: " << boxe->x << "," << boxe->y << std::endl;
             if(boxe->is_copy){
@@ -178,7 +206,6 @@ int main() {
             if (boxe->is_has_internal_level){
                 boxe->inter_level->print_level_CIL();
                 is_print[boxe->inter_level->level_number-1]=true;
-
             } else {
                 std::cout << "this box has no internal level" << std::endl;
             }
