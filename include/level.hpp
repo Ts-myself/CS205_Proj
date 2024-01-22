@@ -7,6 +7,11 @@
 
 #include <vector>
 
+struct Point2 {
+    int x;
+    int y;
+};
+
 class Level {
 public:
     Level();
@@ -16,7 +21,9 @@ public:
     void print_level_CIL();
 
     bool load_level(const std::string &level_path, std::vector<Level*> &internal_levels_, std::vector<Box*> &boxes_,
-                    Player &player_);
+                    Player &player_, std::vector<std::string> &level_infos);
+    bool load_level_by_info(const std::vector<std::string> &level_info, std::vector<Level *> &internal_levels_,
+                    std::vector<Box *> &boxes_, Player &player_);
 
 //    int player_movable(size_t player_index, int dx, int dy);
 //    void player_move(size_t player_index, int dx, int dy,int player_movable);
